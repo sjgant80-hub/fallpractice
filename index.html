@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>◊ FallPractice · sovereign IFA firm accounting · fees · CASS · PI · FCA</title>
+<meta name="description" content="Sovereign firm-side accounting for UK IFA practices · adviser fee ledger · trail commission · CASS segregation · PI/FCA accruals · per-client RIY · per-adviser P&L · firm P&L · invoice generator · RegData hint. Single HTML, IDB primary, MIT.">
+<meta name="prime" content="739">
+<meta name="theme-color" content="#0b0a0f">
+<link rel="manifest" href='data:application/manifest+json,{"name":"FallPractice","short_name":"practice","start_url":"./","display":"standalone","background_color":"%230b0a0f","theme_color":"%23b8974a","icons":[{"src":"data:image/svg+xml;utf8,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 192 192%27><rect width=%27192%27 height=%27192%27 fill=%27%230b0a0f%27 rx=%2828%27/><text x=%2796%27 y=%27140%27 font-family=%27Georgia, serif%27 font-size=%27122%27 font-weight=%27700%27 text-anchor=%27middle%27 fill=%27%23b8974a%27>%E2%97%8A</text></svg>","sizes":"192x192","type":"image/svg+xml"}]}'>
+<style>
+:root{
+  --void:#0b0a0f;--void-2:#13121a;--ink:#1a1922;--ink-2:#22212c;
+  --line:#2a2934;--line-soft:#1f1e28;
+  --cream:#e6e1d6;--cream-dim:#a8a395;--cream-muted:#6e6a5e;
+  --brass:#b8974a;--amber:#ff8c00;--ox:#8b1a1a;
+  --green:#4ade80;--red:#ef4444;--blue:#60a5fa;--yellow:#fbbf24;
+  --serif:Georgia,'Libre Baskerville',ui-serif,serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'IBM Plex Mono','SF Mono',ui-monospace,Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--void);color:var(--cream);font:14px/1.55 var(--sans);min-height:100dvh;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;background:transparent;border:none;color:inherit}
+input,textarea,select{font-family:inherit;background:var(--ink);border:1px solid var(--line);color:var(--cream);border-radius:3px;padding:7px 10px;outline:none;font-size:13px}
+input:focus,textarea:focus,select:focus{border-color:var(--brass)}
+input[type=number]{font-family:var(--mono)}
+a{color:var(--brass)} a:hover{color:var(--amber)}
+.app{min-height:100dvh;display:grid;grid-template-rows:48px 1fr}
+header{display:flex;align-items:center;border-bottom:1px solid var(--line);background:var(--void-2);user-select:none}
+.brand{display:flex;align-items:center;gap:10px;padding:0 16px;height:100%;border-right:1px solid var(--line)}
+.brand .mark{width:28px;height:28px;background:linear-gradient(135deg,var(--brass),var(--amber));border-radius:5px;display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:16px;color:var(--void)}
+.brand .name{font-family:var(--serif);font-weight:600;font-size:14px;letter-spacing:0.02em}
+.brand .seal{font-family:var(--mono);font-size:9px;color:var(--cream-muted);letter-spacing:0.18em;text-transform:uppercase}
+nav.tabs{display:flex;flex:1;overflow-x:auto;align-items:stretch}
+nav.tabs button{padding:0 14px;font-size:12px;color:var(--cream-dim);letter-spacing:0.04em;display:flex;align-items:center;gap:6px;border-right:1px solid var(--line-soft);height:100%;white-space:nowrap;border-top:2px solid transparent}
+nav.tabs button:hover{background:var(--ink);color:var(--cream)}
+nav.tabs button.active{background:var(--ink);color:var(--brass);border-top-color:var(--brass)}
+.tools-r{display:flex;align-items:center;gap:5px;padding:0 14px;height:100%;border-left:1px solid var(--line)}
+.tool-btn{padding:5px 11px;border-radius:3px;font-size:11px;color:var(--cream-dim);letter-spacing:0.06em;text-transform:uppercase;font-family:var(--mono);border:1px solid var(--line)}
+.tool-btn:hover{background:var(--ink);color:var(--cream);border-color:var(--brass)}
+.tool-btn.primary{background:var(--brass);color:var(--void);border-color:var(--brass);font-weight:600}
+.tool-btn.primary:hover{background:var(--amber);border-color:var(--amber)}
+.tool-btn.t3{border-color:var(--blue);color:var(--blue)}
+main{padding:18px 22px 60px;overflow-y:auto;max-width:1240px;margin:0 auto;width:100%}
+.disclaimer{background:rgba(139,26,26,0.15);border:1px solid var(--ox);border-left:3px solid var(--ox);border-radius:3px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:var(--cream)}
+.disclaimer strong{color:var(--brass)}
+.section-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;gap:14px;flex-wrap:wrap}
+.section-h h2{font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:0.01em}
+.section-h .sub{font-family:var(--mono);font-size:11px;color:var(--cream-muted);letter-spacing:0.08em;text-transform:uppercase}
+.section-h .actions{display:flex;gap:6px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px}
+.card{background:var(--void-2);border:1px solid var(--line);border-radius:4px;padding:16px 18px}
+.card h3{font-family:var(--serif);font-size:14px;font-weight:600;margin-bottom:10px;color:var(--cream);letter-spacing:0.01em}
+.card h3 .meta{font-family:var(--mono);font-size:10px;color:var(--brass);letter-spacing:0.1em;margin-left:8px}
+.kpi{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--line-soft);font-size:13px}
+.kpi:last-child{border-bottom:none}
+.kpi .l{color:var(--cream-dim)} .kpi .v{font-family:var(--mono);color:var(--cream);font-weight:500}
+.kpi .v.green{color:var(--green)}.kpi .v.red{color:var(--red)}.kpi .v.amber{color:var(--amber)}.kpi .v.brass{color:var(--brass)}.kpi .v.blue{color:var(--blue)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.field label{display:block;font-family:var(--mono);font-size:10px;color:var(--cream-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px}
+.field input,.field select,.field textarea{width:100%}
+.field .hint{font-size:10px;color:var(--cream-muted);margin-top:3px;font-family:var(--mono)}
+.btn{padding:7px 14px;border:1px solid var(--brass);border-radius:3px;font-size:12px;color:var(--cream);background:transparent;letter-spacing:0.04em;cursor:pointer}
+.btn:hover{border-color:var(--amber);color:var(--amber)}
+.btn.primary{background:var(--brass);color:var(--void);border-color:var(--brass);font-weight:600}
+.btn.primary:hover{background:var(--amber);border-color:var(--amber);color:var(--void)}
+.btn.danger:hover{border-color:var(--red);color:var(--red)}
+.btn.sm{padding:4px 9px;font-size:11px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line-soft);text-align:left;vertical-align:top}
+th{color:var(--brass);font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;font-weight:600}
+td.r{text-align:right;font-family:var(--mono)}
+td.mono{font-family:var(--mono);font-size:12px}
+tr.total td{font-weight:600;border-top:1px solid var(--brass);border-bottom:none;padding-top:10px}
+tr.total td.r{color:var(--brass)}
+tr.clickable{cursor:pointer}
+tr.clickable:hover td{background:var(--ink)}
+.bar{height:6px;background:var(--ink);border-radius:3px;overflow:hidden;margin:6px 0}
+.bar > div{height:100%;background:var(--brass);transition:width 0.3s}
+.bar > div.green{background:var(--green)}.bar > div.red{background:var(--red)}.bar > div.amber{background:var(--amber)}
+.tag{display:inline-block;padding:2px 7px;border-radius:11px;font-family:var(--mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;border:1px solid var(--brass);color:var(--brass);margin-right:4px;white-space:nowrap}
+.tag.amber{border-color:var(--amber);color:var(--amber)}
+.tag.green{border-color:var(--green);color:var(--green)}
+.tag.red{border-color:var(--red);color:var(--red)}
+.tag.blue{border-color:var(--blue);color:var(--blue)}
+.tag.muted{border-color:var(--cream-muted);color:var(--cream-muted)}
+.empty{padding:24px;text-align:center;color:var(--cream-muted);font-style:italic;font-size:12px}
+.chat{display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding:6px}
+.msg{padding:10px 14px;border-radius:6px;max-width:88%;font-size:13px;line-height:1.55;white-space:pre-wrap}
+.msg.user{background:var(--ink);align-self:flex-end;border-bottom-right-radius:2px}
+.msg.bot{background:var(--void-2);border:1px solid var(--line);border-left:2px solid var(--brass);align-self:flex-start;border-bottom-left-radius:2px}
+.msg.bot .src{font-family:var(--mono);font-size:10px;color:var(--cream-muted);letter-spacing:0.08em;margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}
+.chat-input{display:flex;gap:8px;margin-top:10px}
+.chat-input input{flex:1;padding:11px 14px}
+.palette-bg,.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:flex-start;justify-content:center;padding-top:14vh;z-index:900;backdrop-filter:blur(4px)}
+.palette-bg.open,.modal-bg.open{display:flex}
+.modal-bg{align-items:center;padding:18px}
+.palette{background:var(--void-2);border:1px solid var(--brass);border-radius:5px;width:min(640px,90%);box-shadow:0 18px 50px rgba(0,0,0,0.7);overflow:hidden}
+.palette-hd{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center}
+.palette-hd .glyph{font-family:var(--serif);font-size:18px;color:var(--brass)}
+.palette-hd input{flex:1;border:none;background:transparent;font-size:15px;padding:4px}
+.palette-bd{max-height:50vh;overflow:auto;padding:8px}
+.modal{background:var(--void-2);border:1px solid var(--brass);border-radius:4px;padding:22px;max-width:700px;width:100%;max-height:90vh;overflow:auto}
+.modal h2{font-family:var(--serif);font-size:17px;margin-bottom:14px}
+.modal .actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--brass);color:var(--void);padding:9px 18px;border-radius:3px;font-family:var(--mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;opacity:0;transition:all 0.22s;z-index:1100;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.alloc-row{display:grid;grid-template-columns:2fr 1fr 32px;gap:6px;margin-bottom:5px;align-items:center}
+.barchart{display:flex;align-items:flex-end;gap:8px;height:140px;padding:8px 0;border-bottom:1px solid var(--line-soft);margin-bottom:8px}
+.barchart .b{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.barchart .b .bar2{width:100%;min-height:2px;display:flex;flex-direction:column-reverse;border-radius:2px;overflow:hidden}
+.barchart .b .seg{width:100%;min-height:1px}
+.barchart .b .lab{font-family:var(--mono);font-size:9px;color:var(--cream-muted);letter-spacing:0.06em;text-transform:uppercase;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:10px;color:var(--cream-dim);margin-top:6px}
+.legend .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.cls{padding:5px 9px;background:var(--ink);border-radius:3px;font-family:var(--mono);font-size:11px;color:var(--cream);margin-right:5px;margin-bottom:5px;display:inline-block;border:1px solid var(--line)}
+.cls.active{background:var(--brass);color:var(--void);border-color:var(--brass);font-weight:600}
+.checklist{list-style:none;padding:0}
+.checklist li{padding:6px 0;border-bottom:1px dashed var(--line-soft);font-size:13px;display:flex;align-items:flex-start;gap:8px}
+.checklist li:last-child{border-bottom:none}
+.checklist li input{margin-top:3px}
+@media (max-width:760px){nav.tabs button{padding:0 11px;font-size:11px}main{padding:14px 14px 50px}.row,.row3{grid-template-columns:1fr}.grid,.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand">
+    <div class="mark">◊</div>
+    <div><div class="name">FallPractice</div></div>
+    <div class="seal">v1 · prime 739</div>
+  </div>
+  <nav class="tabs" id="tabNav"></nav>
+  <div class="tools-r">
+    <button class="tool-btn primary" onclick="openPalette()" title="ask · Ctrl+K">◊ ask</button>
+    <button class="tool-btn" id="tierBadge" onclick="openModal('settings')">T0</button>
+    <button class="tool-btn" onclick="openModal('settings')">cog</button>
+  </div>
+</header>
+<main id="view"></main>
+</div>
+<div class="palette-bg" id="palette">
+  <div class="palette">
+    <div class="palette-hd">
+      <span class="glyph">◊</span>
+      <input type="text" id="pInput" placeholder="ask · 'what is CASS?' · 'when is FCA fee due?' · 'is adviser advice VAT-exempt?'">
+      <span id="pTier" style="font-family:var(--mono);font-size:10px;color:var(--cream-muted)">T0</span>
+    </div>
+    <div class="palette-bd" id="pBody"></div>
+  </div>
+</div>
+<div class="modal-bg" id="modal">
+  <div class="modal"><h2 id="modalTitle">.</h2><div id="modalBody"></div></div>
+</div>
+<div class="toast" id="toast">.</div>
+
+<script>
+'use strict';
+// ════════════════════════════════════════════════════════════════
+// FallPractice v1.0.0 · sovereign IFA firm accounting · MIT
+// ◊·κ=1 · prime 739 · firm-side: fees · CASS · PI · FCA · P&L
+// TOOL · NOT REGULATED ADVICE · FCA submissions remain firm's responsibility
+// ════════════════════════════════════════════════════════════════
+const TOOLNAME='fallpractice';
+const VERSION='1.0.0';
+const PRIME=739;
+const STORE='fallpractice-v1';
+const TAX_YEAR='2025-26';
+
+// UK firm-side rule constants (calibrated 2025-26)
+const RULES={
+  vatStandard:0.20,
+  vatRegThreshold:90000,            // £ turnover · VAT registration
+  fcaFeeMinimum:1500,               // typical small firm minimum periodic fee
+  cassAmberDays:25,                 // 7.13 daily reconciliation expected
+  cassRedDays:45,
+  piMinCoverSingle:1300000,         // IDD/MiFID min PI single-claim cover (≈ EUR 1.3m)
+  piMinCoverAggregate:1924000,      // aggregate
+  rmarFreqMonths:6,                 // half-yearly RMAR for IFAs
+  fcaFeeQuarterMonth:7,             // FCA invoices issued July, due Aug
+  invoiceTermsDays:14,
+  pencePerPound:100,
+};
+
+const TABS=[
+  {id:'dashboard',label:'◊ dashboard'},
+  {id:'fees',label:'fees'},
+  {id:'schedules',label:'schedules'},
+  {id:'clients',label:'clients'},
+  {id:'advisers',label:'advisers'},
+  {id:'cass',label:'CASS'},
+  {id:'firm-pl',label:'firm P&L'},
+  {id:'expenses',label:'expenses'},
+  {id:'regdata',label:'RegData'},
+  {id:'qa',label:'Q&A'},
+];
+
+let state={
+  active:'dashboard',
+  selectedClientId:null,
+  selectedAdviserId:null,
+  firm:null,
+  clients:[],
+  advisers:[],
+  feeLedger:[],
+  feeSchedules:[],
+  cassEntries:[],
+  expenses:[],            // {id,month:'2026-05',type,amount,notes}
+  chat:[],
+  audit:[],
+  settings:{
+    anthropicKey:'',geminiKey:'',openaiKey:'',openrouterKey:'',
+    auditChain:true,
+    piAnnualPremium:0,
+    fcaAnnualEstimate:1500,
+    profBodyAnnual:300,
+    bankDetails:'',
+    demoLoaded:false,
+  },
+};
+
+// ─── util ───
+const $=(s,p=document)=>p.querySelector(s);
+const $$=(s,p=document)=>Array.from(p.querySelectorAll(s));
+const uid=p=>(p||'')+Math.random().toString(36).slice(2,11);
+const now=()=>Date.now();
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>(+n||0).toLocaleString('en-GB',{minimumFractionDigits:0,maximumFractionDigits:0});
+const money=n=>'£'+fmt(n);
+const moneyP=n=>'£'+(+n||0).toLocaleString('en-GB',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct=n=>((+n||0)*100).toFixed(1)+'%';
+const isoDate=ts=>new Date(ts||Date.now()).toISOString().slice(0,10);
+const monthKey=ts=>new Date(ts||Date.now()).toISOString().slice(0,7);
+const dayMs=86400000;
+const daysBetween=(a,b)=>Math.floor((b-a)/dayMs);
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._to);t._to=setTimeout(()=>t.classList.remove('show'),1900)}
+async function sha256(s){const buf=new TextEncoder().encode(String(s));const h=await crypto.subtle.digest('SHA-256',buf);return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,'0')).join('')}
+
+// ─── IDB ───
+let db;
+const STORES=['state','clients','advisers','firms','feeLedger','feeSchedules','cassEntries','expenses','audit'];
+function openDB(){return new Promise((res,rej)=>{
+  const r=indexedDB.open(STORE,1);
+  r.onupgradeneeded=e=>{const d=e.target.result;for(const s of STORES){if(!d.objectStoreNames.contains(s)){d.createObjectStore(s,{keyPath:'id'})}}};
+  r.onsuccess=e=>{db=e.target.result;res(db)};
+  r.onerror=()=>rej(r.error);
+});}
+function txStore(name,mode='readonly'){const tx=db.transaction(name,mode);return tx.objectStore(name)}
+function idbPut(store,val){return new Promise(r=>{const req=txStore(store,'readwrite').put(val);req.onsuccess=()=>r(true);req.onerror=()=>r(false)})}
+function idbDel(store,key){return new Promise(r=>{const req=txStore(store,'readwrite').delete(key);req.onsuccess=()=>r(true)})}
+function idbGetAll(store){return new Promise(r=>{const req=txStore(store).getAll();req.onsuccess=()=>r(req.result||[]);req.onerror=()=>r([])})}
+function idbGet(store,key){return new Promise(r=>{const req=txStore(store).get(key);req.onsuccess=()=>r(req.result);req.onerror=()=>r(null)})}
+
+async function appendAudit(action,reasoning,payload){
+  if(!state.settings.auditChain)return;
+  const prev=state.audit.length?state.audit[state.audit.length-1]:null;
+  const prevHash=prev?prev.hash:'';
+  const docStr=JSON.stringify(payload||{});
+  const docHash=await sha256(docStr);
+  const i=(prev?prev.i:0)+1;
+  const ts=Date.now();
+  const hash=await sha256(prevHash+docHash+ts+i);
+  const entry={id:'au_'+i+'_'+ts,i,ts,tool:TOOLNAME,configVersion:TOOLNAME+'@'+VERSION,adviserId:'',clientId:payload?.clientId||'',action,reasoning:reasoning||'',prevHash,docHash,hash,payload:payload||{}};
+  state.audit.push(entry);
+  if(state.audit.length>5000)state.audit=state.audit.slice(-5000);
+  await idbPut('audit',entry);
+}
+
+async function saveState(){
+  await idbPut('state',{id:'singleton',active:state.active,selectedClientId:state.selectedClientId,selectedAdviserId:state.selectedAdviserId,settings:state.settings,chat:state.chat});
+}
+async function loadAll(){
+  await openDB();
+  const s=await idbGet('state','singleton');
+  if(s){state.active=s.active||state.active;state.selectedClientId=s.selectedClientId||null;state.selectedAdviserId=s.selectedAdviserId||null;state.settings=Object.assign({},state.settings,s.settings||{});state.chat=s.chat||[]}
+  state.clients=await idbGetAll('clients');
+  state.advisers=await idbGetAll('advisers');
+  const firms=await idbGetAll('firms');state.firm=firms[0]||null;
+  state.feeLedger=await idbGetAll('feeLedger');
+  state.feeSchedules=await idbGetAll('feeSchedules');
+  state.cassEntries=await idbGetAll('cassEntries');
+  state.expenses=await idbGetAll('expenses');
+  state.audit=await idbGetAll('audit');
+  // localStorage settings fallback
+  try{const ls=localStorage.getItem(STORE+'.settings');if(ls&&!s){state.settings=Object.assign({},state.settings,JSON.parse(ls))}}catch(e){}
+}
+function persistSettingsLS(){try{localStorage.setItem(STORE+'.settings',JSON.stringify(state.settings))}catch(e){}}
+
+// ─── Demo data seed ───
+async function maybeSeedDemo(){
+  if(state.settings.demoLoaded)return;
+  if(state.clients.length||state.advisers.length||state.firm)return;
+  const firmId='fm_demo_'+uid();
+  state.firm={id:firmId,createdAt:now(),updatedAt:now(),name:'Patel Wealth Ltd',tradingName:'',fcaRefNo:'123456',companiesHouseNo:'',vatNumber:'',registeredAddress:{line1:'1 King St',city:'London',postcode:'SW1A 1AA',country:'GB'},piInsurer:'Howden',piPolicyNo:'PI-2026-PW',piExpiresAt:Date.now()+120*dayMs,professionalBody:'CISI',brandColor:'#8b1a1a',brandLogoDataUri:'',setupCompletedAt:now(),demo:true};
+  await idbPut('firms',state.firm);
+  const adv={id:'ad_demo_'+uid(),firmId,createdAt:now(),updatedAt:now(),archivedAt:null,name:'James Bond',email:'james@patelwealth.example',phone:'+44 7700 900111',fcaRefNo:'JB123','smcrRole':'SMF22',status:'active',startedAt:now()-365*dayMs,leftAt:null,demo:true};
+  state.advisers=[adv];await idbPut('advisers',adv);
+  const cl={id:'cl_demo_'+uid(),firmId,createdAt:now()-200*dayMs,updatedAt:now(),archivedAt:null,title:'Mr',firstName:'Alice',middleName:'',lastName:'Patel',preferredName:'',dob:'1980-03-14',gender:'',nationality:'GB',countryOfResidence:'GB',nino:'AB123456C',utr:'',taxResidency:['GB'],email:'alice@example.com',phone:'+44 7700 900000',address:{line1:'12 High St',line2:'',city:'London',region:'England',postcode:'SW1A 1AA',country:'GB',since:'2020-06-01'},addressHistory:[],relationships:[],kyc:{status:'verified',riskGrade:'low',pepFlag:false,pepDetails:'',sanctionsStatus:'clear',sanctionsCheckedAt:now()-30*dayMs,sanctionsCheckedBy:adv.id,sourceOfFunds:'earnings',sourceOfFundsNotes:'',sourceOfWealth:'earnings',sourceOfWealthNotes:'',vulnerableCustomerFlag:false,vulnerabilityCategory:'',vulnerabilityNotes:'',documentsHeld:[],lastReviewAt:now()-30*dayMs,nextReviewDue:now()+335*dayMs},suitability:{attitudeToRisk:4,capacityForLoss:'medium',knowledgeExperience:'medium',investmentHorizon:20,objectives:[{priority:1,name:'retirement',horizon:25,target:500000,notes:''}],incomeNeeds:0,ethicalPreferences:'',lastReviewAt:now()-90*dayMs},adviserId:adv.id,engagement:{startedAt:now()-180*dayMs,type:'ongoing',feeBasis:'AUM%',feeAgreementHash:'',feeAgreementSignedAt:now()-180*dayMs,initialFee:1500,ongoingFee:0.0075,nextReviewDue:now()+185*dayMs},notes:[],links:{falladviserScenarios:[],fallpracticeFeeLedgerIds:[],fallpaperDocumentIds:[]},portfolioValue:240000,demo:true};
+  state.clients=[cl];await idbPut('clients',cl);
+  // 3 demo fees spanning last quarter
+  const fees=[
+    {id:'fl_'+uid(),clientId:cl.id,adviserId:adv.id,firmId,ts:now()-85*dayMs,dateOf:isoDate(now()-85*dayMs),type:'initial',basis:'flat',description:'Initial advice + onboarding fee',gross:1500,vat:0,net:1500,status:'received',invoiceId:'INV-2026-001',receivedAt:now()-78*dayMs,allocations:[{adviserId:adv.id,costCentreId:'',share:1.0}],demo:true},
+    {id:'fl_'+uid(),clientId:cl.id,adviserId:adv.id,firmId,ts:now()-55*dayMs,dateOf:isoDate(now()-55*dayMs),type:'ongoing',basis:'AUM%',description:'Quarterly ongoing fee · 0.75% AUM · £240k',gross:450,vat:0,net:450,status:'received',invoiceId:'INV-2026-002',receivedAt:now()-48*dayMs,allocations:[{adviserId:adv.id,costCentreId:'',share:1.0}],demo:true},
+    {id:'fl_'+uid(),clientId:cl.id,adviserId:adv.id,firmId,ts:now()-12*dayMs,dateOf:isoDate(now()-12*dayMs),type:'ongoing',basis:'AUM%',description:'Quarterly ongoing fee · 0.75% AUM · £240k',gross:450,vat:0,net:450,status:'invoiced',invoiceId:'INV-2026-003',receivedAt:null,allocations:[{adviserId:adv.id,costCentreId:'',share:1.0}],demo:true},
+  ];
+  for(const f of fees){state.feeLedger.push(f);await idbPut('feeLedger',f)}
+  // recurring schedule
+  const sched={id:'sc_'+uid(),clientId:cl.id,adviserId:adv.id,firmId,frequency:'quarterly',amount:450,basis:'AUM%',description:'Quarterly ongoing fee · 0.75% AUM',startDate:isoDate(now()-180*dayMs),endDate:null,nextDueAt:now()+78*dayMs,active:true,demo:true};
+  state.feeSchedules.push(sched);await idbPut('feeSchedules',sched);
+  // a CASS receipt + reconciliation
+  const cass1={id:'ce_'+uid(),clientId:cl.id,ts:now()-30*dayMs,dateOf:isoDate(now()-30*dayMs),type:'receipt',amount:2000,account:'cass',notes:'Held for forthcoming pension transfer',reconciledAt:null,demo:true};
+  const cass2={id:'ce_'+uid(),clientId:'',ts:now()-2*dayMs,dateOf:isoDate(now()-2*dayMs),type:'reconciliation',amount:0,account:'cass',notes:'Daily reconciliation · all entries match',reconciledAt:now()-2*dayMs,demo:true};
+  state.cassEntries.push(cass1,cass2);await idbPut('cassEntries',cass1);await idbPut('cassEntries',cass2);
+  // example expenses for this month
+  const m=monthKey(now());
+  const exp1={id:'ex_'+uid(),month:m,type:'PI insurance',amount:Math.round((state.settings.piAnnualPremium||3600)/12),notes:'Monthly PI accrual',ts:now(),demo:true};
+  const exp2={id:'ex_'+uid(),month:m,type:'Software',amount:120,notes:'Intelliflo · monthly',ts:now(),demo:true};
+  state.expenses.push(exp1,exp2);await idbPut('expenses',exp1);await idbPut('expenses',exp2);
+  state.settings.demoLoaded=true;state.selectedClientId=cl.id;state.selectedAdviserId=adv.id;
+  await saveState();persistSettingsLS();
+  await appendAudit('demo.seeded','Empty-state demo data loaded',{firm:state.firm.id,adviserCount:1,clientCount:1,feeCount:3});
+}
+
+// ─── Recurring fee cron-on-open ───
+async function runScheduleCron(){
+  let generated=0;
+  const today=now();
+  for(const s of state.feeSchedules){
+    if(!s.active)continue;
+    while(s.nextDueAt&&s.nextDueAt<=today){
+      const cl=state.clients.find(c=>c.id===s.clientId);
+      const fee={
+        id:'fl_'+uid(),clientId:s.clientId,adviserId:s.adviserId,firmId:s.firmId||state.firm?.id||'',
+        ts:s.nextDueAt,dateOf:isoDate(s.nextDueAt),
+        type:'ongoing',basis:s.basis||'AUM%',
+        description:(s.description||'Recurring fee')+' · auto-generated',
+        gross:s.amount,vat:0,net:s.amount,
+        status:'invoiced',invoiceId:'INV-AUTO-'+(state.feeLedger.length+1).toString().padStart(4,'0'),
+        receivedAt:null,
+        allocations:[{adviserId:s.adviserId,costCentreId:'',share:1.0}],
+        scheduleId:s.id,
+      };
+      state.feeLedger.push(fee);await idbPut('feeLedger',fee);
+      generated++;
+      // advance
+      s.nextDueAt=advanceDate(s.nextDueAt,s.frequency);
+    }
+    await idbPut('feeSchedules',s);
+  }
+  if(generated){await appendAudit('schedule.cron.generated','Cron generated recurring fees',{count:generated});toast(generated+' recurring fee(s) generated')}
+}
+function advanceDate(ts,freq){const d=new Date(ts);if(freq==='monthly')d.setMonth(d.getMonth()+1);else if(freq==='quarterly')d.setMonth(d.getMonth()+3);else if(freq==='annually')d.setFullYear(d.getFullYear()+1);else d.setMonth(d.getMonth()+1);return d.getTime()}
+
+// ─── BroadcastChannel mesh ───
+let chFallClient=null, chFallSignal=null;
+function setupMesh(){
+  try{
+    chFallClient=new BroadcastChannel('fall-client');
+    chFallClient.addEventListener('message',onFallClientMsg);
+    // boot sync request
+    chFallClient.postMessage({v:1,type:'sync.request',ts:now(),source:TOOLNAME,payload:{}});
+  }catch(e){}
+  try{
+    chFallSignal=new BroadcastChannel('fall-signal');
+    chFallSignal.postMessage({source:TOOLNAME,type:'hello',prime:PRIME,version:VERSION,ts:now()});
+    chFallSignal.addEventListener('message',async e=>{
+      const m=e.data;if(!m)return;
+      if(m.type==='ping')chFallSignal.postMessage({source:TOOLNAME,type:'pong',prime:PRIME});
+      if(m.source==='si-didy'&&m.type==='query'&&m.intent){const ans=await answerQuestion(m.intent);chFallSignal.postMessage({source:TOOLNAME,type:'answer',replyTo:m.id,text:ans.text})}
+    });
+  }catch(e){}
+}
+async function onFallClientMsg(e){
+  const m=e.data;if(!m||m.source===TOOLNAME)return;
+  if(m.type==='sync.request'){
+    chFallClient.postMessage({v:1,type:'sync.snapshot',ts:now(),source:TOOLNAME,payload:{clients:state.clients,advisers:state.advisers,firm:state.firm}});
+    return;
+  }
+  if(m.type==='sync.snapshot'){
+    const p=m.payload||{};
+    if(p.firm&&(!state.firm||(p.firm.updatedAt||0)>(state.firm.updatedAt||0))){state.firm=p.firm;await idbPut('firms',p.firm)}
+    if(Array.isArray(p.clients))for(const c of p.clients){const ex=state.clients.find(x=>x.id===c.id);if(!ex||(c.updatedAt||0)>(ex.updatedAt||0)){if(ex)Object.assign(ex,c);else state.clients.push(c);await idbPut('clients',c)}}
+    if(Array.isArray(p.advisers))for(const a of p.advisers){const ex=state.advisers.find(x=>x.id===a.id);if(!ex||(a.updatedAt||0)>(ex.updatedAt||0)){if(ex)Object.assign(ex,a);else state.advisers.push(a);await idbPut('advisers',a)}}
+    render();return;
+  }
+  if(m.type==='client.created'||m.type==='client.updated'){
+    const c=m.payload;if(!c||!c.id)return;
+    const ex=state.clients.find(x=>x.id===c.id);
+    if(ex)Object.assign(ex,c);else state.clients.push(c);
+    await idbPut('clients',c);
+    render();return;
+  }
+  if(m.type==='client.archived'){
+    const c=m.payload;if(!c||!c.id)return;
+    const ex=state.clients.find(x=>x.id===c.id);if(ex){ex.archivedAt=c.archivedAt||now();await idbPut('clients',ex)}
+    // warn if open ongoing schedule
+    const openSched=state.feeSchedules.find(s=>s.clientId===c.id&&s.active);
+    if(openSched){toast('warning: archived client has active fee schedule')}
+    render();return;
+  }
+  if(m.type==='adviser.created'||m.type==='adviser.updated'){
+    const a=m.payload;if(!a||!a.id)return;
+    const ex=state.advisers.find(x=>x.id===a.id);
+    if(ex)Object.assign(ex,a);else state.advisers.push(a);
+    await idbPut('advisers',a);render();return;
+  }
+  if(m.type==='firm.updated'){
+    if(m.payload){state.firm=m.payload;await idbPut('firms',m.payload);render()}
+    return;
+  }
+}
+let bcastDebounce=null;
+function broadcastUpsert(type,payload){
+  clearTimeout(bcastDebounce);
+  bcastDebounce=setTimeout(()=>{try{chFallClient&&chFallClient.postMessage({v:1,type,ts:now(),source:TOOLNAME,payload})}catch(e){}},300);
+}
+function broadcastFeeRecorded(fee){
+  try{chFallClient&&chFallClient.postMessage({v:1,type:'fee.recorded',ts:now(),source:TOOLNAME,payload:fee})}catch(e){}
+}
+
+// ─── Fee analytics ───
+function feesForClient(clientId){return state.feeLedger.filter(f=>f.clientId===clientId)}
+function feesForAdviser(adviserId){
+  // count by allocations (a fee can be split across advisers)
+  return state.feeLedger.map(f=>{
+    const alloc=(f.allocations||[]).find(a=>a.adviserId===adviserId);
+    if(!alloc)return null;
+    return {fee:f,share:alloc.share||0,attributable:(f.net||0)*(alloc.share||0)};
+  }).filter(Boolean);
+}
+function totalFirmRevenue(opts){
+  opts=opts||{};
+  let total=0;
+  for(const f of state.feeLedger){
+    if(opts.received&&f.status!=='received')continue;
+    if(opts.month&&monthKey(f.ts)!==opts.month)continue;
+    if(opts.year&&new Date(f.ts).getFullYear()!==opts.year)continue;
+    if(opts.type&&f.type!==opts.type)continue;
+    total+=(f.net||0);
+  }
+  return total;
+}
+function ytdFees(){const y=new Date().getFullYear();return totalFirmRevenue({year:y})}
+function mtdFees(){return totalFirmRevenue({month:monthKey(now())})}
+function feesByType(){
+  const types=['initial','ongoing','one-off','transactional','trail-commission'];
+  const map={};for(const t of types)map[t]=0;
+  for(const f of state.feeLedger){if(map[f.type]===undefined)map[f.type]=0;map[f.type]+=(f.net||0)}
+  return map;
+}
+function feesByMonth(n){
+  // last n months ending current
+  const map=new Map();
+  const d=new Date();d.setDate(1);
+  for(let i=n-1;i>=0;i--){const dd=new Date(d.getFullYear(),d.getMonth()-i,1);map.set(monthKey(dd),{initial:0,ongoing:0,'one-off':0,transactional:0,'trail-commission':0,total:0})}
+  for(const f of state.feeLedger){
+    const k=monthKey(f.ts);if(!map.has(k))continue;
+    const e=map.get(k);if(e[f.type]===undefined)e[f.type]=0;e[f.type]+=(f.net||0);e.total+=(f.net||0);
+  }
+  return [...map.entries()].map(([k,v])=>({month:k,...v}));
+}
+function vatTotalQuarter(){
+  // current quarter VAT collected
+  const d=new Date();const q=Math.floor(d.getMonth()/3);const startM=q*3;
+  const start=new Date(d.getFullYear(),startM,1).getTime();
+  const end=new Date(d.getFullYear(),startM+3,1).getTime();
+  let v=0;for(const f of state.feeLedger){if(f.ts>=start&&f.ts<end)v+=(f.vat||0)}
+  return {quarter:'Q'+(q+1)+' '+d.getFullYear(),vat:v};
+}
+function clientLifetimeFees(clientId){return feesForClient(clientId).reduce((a,f)=>a+(f.net||0),0)}
+function clientYtdFees(clientId){const y=new Date().getFullYear();return feesForClient(clientId).filter(f=>new Date(f.ts).getFullYear()===y).reduce((a,f)=>a+(f.net||0),0)}
+function nextDueForClient(clientId){const s=state.feeSchedules.filter(s=>s.clientId===clientId&&s.active).sort((a,b)=>a.nextDueAt-b.nextDueAt)[0];return s?s.nextDueAt:null}
+function lastInvoiceForClient(clientId){const arr=feesForClient(clientId).slice().sort((a,b)=>b.ts-a.ts);return arr[0]||null}
+function clientPortfolioValue(c){return (c?.portfolioValue||c?.suitability?.objectives?.[0]?.target||0)}
+function clientRIY(c){const pv=clientPortfolioValue(c);const ongoing=feesForClient(c.id).filter(f=>f.type==='ongoing').reduce((a,f)=>a+(f.net||0),0);if(!pv||!ongoing)return 0;return ongoing/pv}
+
+// ─── CASS analytics ───
+function cassTotalHeld(){
+  let total=0;
+  for(const e of state.cassEntries){
+    if(e.account!=='cass')continue;
+    if(e.type==='receipt'||e.type==='segregation')total+=(e.amount||0);
+    if(e.type==='disbursement')total-=(e.amount||0);
+  }
+  return total;
+}
+function cassUnreconciled(){return state.cassEntries.filter(e=>e.type!=='reconciliation'&&!e.reconciledAt)}
+function lastReconciliation(){const r=state.cassEntries.filter(e=>e.type==='reconciliation').sort((a,b)=>b.ts-a.ts);return r[0]||null}
+function daysSinceReconciliation(){const l=lastReconciliation();return l?daysBetween(l.ts,now()):999}
+
+// ─── Expense + accruals ───
+function expensesForMonth(m){return state.expenses.filter(e=>e.month===m)}
+function expensesTotal(m){return expensesForMonth(m).reduce((a,e)=>a+(e.amount||0),0)}
+function piMonthlyAccrual(){return Math.round((state.settings.piAnnualPremium||0)/12)}
+function fcaMonthlyAccrual(){return Math.round((state.settings.fcaAnnualEstimate||0)/12)}
+function profBodyMonthlyAccrual(){return Math.round((state.settings.profBodyAnnual||0)/12)}
+function piDaysToExpiry(){if(!state.firm?.piExpiresAt)return null;return daysBetween(now(),state.firm.piExpiresAt)}
+function expectedFixedCostMonthly(){return piMonthlyAccrual()+fcaMonthlyAccrual()+profBodyMonthlyAccrual()}
+
+// ═══════════════════════ T0 / T3 cascade ═══════════════════════
+const Cascade={
+  async detectTier(){const s=state.settings;if(await this._probe())return'T2';if(s.anthropicKey||s.openaiKey||s.geminiKey||s.openrouterKey)return'T3';return'T0'},
+  async _probe(){if(this._p!==undefined)return this._p;try{this._p=await Promise.race([fetch('http://127.0.0.1:11434/api/tags').then(r=>r.ok).catch(()=>false),new Promise(r=>setTimeout(()=>r(false),350))])}catch(e){this._p=false}return this._p},
+  async generate(sys,user,maxTok){const s=state.settings,max=maxTok||1400;
+    if(s.anthropicKey)try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':s.anthropicKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-haiku-4-5',max_tokens:max,system:sys,messages:[{role:'user',content:user}]})});const d=await r.json();return{tier:'T3·Claude',text:d?.content?.[0]?.text||''}}catch(e){}
+    if(s.geminiKey)try{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${s.geminiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({systemInstruction:{parts:[{text:sys}]},contents:[{parts:[{text:user}]}]})});const d=await r.json();return{tier:'T3·Gemini',text:d?.candidates?.[0]?.content?.parts?.[0]?.text||''}}catch(e){}
+    if(s.openaiKey)try{const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+s.openaiKey},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'system',content:sys},{role:'user',content:user}]})});const d=await r.json();return{tier:'T3·GPT',text:d?.choices?.[0]?.message?.content||''}}catch(e){}
+    if(s.openrouterKey)try{const r=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+s.openrouterKey,'HTTP-Referer':location.origin},body:JSON.stringify({model:'anthropic/claude-haiku-4-5',messages:[{role:'system',content:sys},{role:'user',content:user}]})});const d=await r.json();return{tier:'T3·OpenRouter',text:d?.choices?.[0]?.message?.content||''}}catch(e){}
+    return{tier:'T0',text:null}
+  }
+};
+async function updateTierBadge(){const t=await Cascade.detectTier();const el=$('#tierBadge');el.textContent=t==='T0'?'offline':t;el.classList.toggle('t3',t!=='T0');$('#pTier').textContent=t==='T0'?'T0':t}
+
+// T0 rules · UK IFA firm-side
+const T0_RULES=[
+  {id:'cass',match:/what'?s? ?(is)? ?cass|client money|segregat/i,answer:()=>`**CASS · Client Assets Sourcebook (FCA)**
+
+CASS sets the rules for how firms hold and protect *client money* and custody assets. Key parts for an IFA practice:
+
+- **CASS 7** · client money rules (segregation, reconciliation, trust)
+- **CASS 7.13** · daily reconciliation expected; gaps must be investigated
+- **Statutory trust** · client money must be held in a designated client bank account, separate from firm money
+- **CMAR** · Client Money & Assets Return — quarterly for firms holding client money
+
+Most IFAs **don't hold client money** (they use platforms/custodians instead), in which case CASS doesn't bite hard. But the moment a cheque made out to the firm passes through your hands, CASS applies.
+
+You currently track ${money(cassTotalHeld())} in the CASS tab · last reconciled ${lastReconciliation()?daysSinceReconciliation()+' days ago':'never'}.`},
+  {id:'vat',match:/vat ?(on|for|exempt)|is.+(advice|adviser).+vat|vatable/i,answer:()=>`**VAT on adviser fees (UK):**
+
+- **Exempt** · advice on regulated financial products (ISAs, pensions, investment portfolios) when the intention is to arrange a transaction — falls under VATA 1994 Sch 9 Group 5 (insurance + investment products).
+- **Standard-rated (20%)** · pure admin, report production, ongoing reviews where no transactional intent exists. HMRC has tightened on this.
+- The 2024 HMRC Brief reaffirmed that **'intermediation'** (bringing client + product together) is exempt; pure 'comfort reviews' aren't.
+
+Practical: most ongoing advice fees you currently take are likely exempt, but flag execution-only and discretionary admin fees as VATable. The fee ledger has a per-entry VAT field — use it.
+
+Firm VAT-registered threshold: ${money(RULES.vatRegThreshold)} turnover. Current YTD fees: ${money(ytdFees())}.`},
+  {id:'recon',match:/reconcil|how often.+(client money|cass)/i,answer:()=>`**CASS reconciliation cadence:**
+
+- **Internal reconciliation** · CASS 7.15.12R · *each business day* for client money. The firm compares its internal records (FallPractice's ledger) with the actual bank balance.
+- **External reconciliation** · CASS 7.15.20R · *at least monthly* against bank statements.
+- Discrepancies must be investigated **same day** and either reflected, returned, or topped up by the firm's own money.
+
+Status: last reconciliation ${lastReconciliation()?'was '+daysSinceReconciliation()+' days ago':'has never been logged'}.
+- Amber after ${RULES.cassAmberDays} days · Red after ${RULES.cassRedDays} days.
+${daysSinceReconciliation()>RULES.cassAmberDays?'⚠ Overdue.':'OK.'}`},
+  {id:'fca-fee',match:/fca fee|periodic fee|when.+(fca|invoice)/i,answer:()=>`**FCA periodic (annual) fee:**
+
+- Invoices issued by FCA in **July** each year, due by **end of August** (firms get a 30-day window).
+- Minimum periodic fee for small firms: typically around ${money(RULES.fcaFeeMinimum)} (varies year to year).
+- Fee blocks for IFAs: usually A.13 (advisory arrangers, no client money) or A.12 (with client money). RMAR-driven.
+- FSCS levy invoiced separately (also July/August).
+- Professional body fees (CISI/PFS) invoiced separately, usually January.
+
+Your estimate set: ${money(state.settings.fcaAnnualEstimate||0)}/yr · accruing ${money(fcaMonthlyAccrual())}/month.
+${piDaysToExpiry()!==null?'PI policy expires in '+piDaysToExpiry()+' days.':''}`},
+  {id:'pi-min',match:/pi (insurance|minimum|cover)|professional indemnit/i,answer:()=>`**PI insurance minimums (IDD / MiFID II aligned):**
+
+- **Single claim** · €1.3m (≈ ${money(RULES.piMinCoverSingle)})
+- **Aggregate** · €1.924m (≈ ${money(RULES.piMinCoverAggregate)})
+- Personal investment firms specifically: PROF 1 + MIPRU 3 require PI as continuing operational condition.
+- Excess: typically £5k-£25k per claim; **must be capitalised** if above £5k per FCA expectations.
+- Cover from a UK or EEA insurer authorised in general insurance.
+
+Your firm: ${state.firm?.piInsurer||'(insurer not set)'} · policy ${state.firm?.piPolicyNo||'(none)'} · expires ${state.firm?.piExpiresAt?isoDate(state.firm.piExpiresAt):'(not set)'} · monthly accrual ${money(piMonthlyAccrual())}.
+${piDaysToExpiry()!==null&&piDaysToExpiry()<60?'⚠ Renewal due in '+piDaysToExpiry()+' days — start the broker conversation now.':''}`},
+  {id:'regdata',match:/regdata|gabriel|rmar|return.+(due|submission)/i,answer:()=>`**FCA RegData (formerly GABRIEL) submissions for IFAs:**
+
+- **RMAR** (Retail Mediation Activities Return) — **half-yearly** for most personal investment firms.
+- RMA reporting periods typically end 30 June and 31 December; submissions due **30 working days** after period end.
+- Other returns: **CCR007** quarterly for some, **FSA002** (capital adequacy) annual.
+- Late submission: £250 fixed penalty + reputational notes on firm record.
+
+Next windows roughly:
+- Jul-Aug · 30 June period
+- Jan-Feb · 31 December period
+
+The RegData tab has a "what to gather" checklist. FallPractice **doesn't submit** for you — that remains your responsibility through the FCA portal.`},
+  {id:'audit',match:/audit chain|why.+audit|prevhash/i,answer:()=>`**Audit chain (Mansoor P3):**
+
+Every state change in FallPractice appends a cryptographic entry:
+\`{i, ts, action, prevHash, docHash, hash}\`
+where \`hash = sha256(prevHash + docHash + ts + i)\`.
+
+Any tampering breaks the chain — verifiable in the Settings tab. Export as JSON for compliance review (FCA SYSC requires records for 5 years; client files 7 years; pensions life-of-record).
+
+Currently ${state.audit.length} entries in chain.`},
+  {id:'trail',match:/trail commission|legacy commission|adviser charging/i,answer:()=>`**Trail commission (post-RDR):**
+
+- The 2012 Retail Distribution Review banned **new** trail commission on advised retail investment products.
+- **Legacy trail** on pre-2013 business can still pay until product matures or transfers — track it under \`type:'trail-commission'\` in the fee ledger.
+- Trail commission on **protection products** (life, CI, IP) was *not* banned by RDR and is still allowed.
+- Disclose all trail to the client at every periodic review (COBS 6).
+
+Current trail entries: ${state.feeLedger.filter(f=>f.type==='trail-commission').length} · totalling ${money(state.feeLedger.filter(f=>f.type==='trail-commission').reduce((a,f)=>a+(f.net||0),0))}.`},
+  {id:'consumer-duty',match:/consumer duty|fair value|price.+value/i,answer:()=>`**Consumer Duty (PRIN 12 · July 2023):**
+
+Four outcomes:
+1. **Products & services** · fit target market
+2. **Price & value** · fair value (not the cheapest, the most appropriate)
+3. **Consumer understanding** · clear, fair, not misleading
+4. **Consumer support** · throughout the lifecycle
+
+Firms must produce an **annual Consumer Duty board report** evidencing each outcome.
+
+For fee setting specifically: document the *value assessment* — what does the client get for the ongoing fee? Periodic reviews? Tax planning? Cashflow modelling? Access to adviser?
+
+FallPaper has the board-report template scaffold. FallPractice's per-client fee dashboard shows the RIY (reduction-in-yield) — useful evidence.`},
+  {id:'7y',match:/(how long|retention|keep).+(records?|files?)/i,answer:()=>`**Record retention (FCA SYSC 9 / COBS):**
+
+- **Client files (KYC, suitability, advice)** · 5 years minimum, but **indefinite** for pension transfers per FG21/3 (life-of-product is safe).
+- **Marketing material** · 5 years
+- **Customer complaints** · 5 years
+- **Financial records** · 6 years (Companies Act for limited companies)
+- **AML records** · 5 years from end of business relationship
+
+Practical: **7 years** is the common safe-harbour figure most firms run with. FallPractice retains the audit chain indefinitely (just keep exporting). IDB lives on-device — back up.`},
+  {id:'sm-cr',match:/smcr|senior managers? regime|smf/i,answer:()=>`**SM&CR for small IFA firms (Core / Limited Scope):**
+
+- **Senior Managers** · need FCA approval; statement of responsibilities; annual fitness & propriety check.
+- Common SMFs for small IFAs: **SMF3** (executive director), **SMF22** (chief executive), **SMF27** (partner).
+- **Certified persons** · anyone who could cause significant harm (most advisers) · firm certifies them annually, no FCA approval.
+- **Conduct Rules** · apply to *everyone* in the firm; breach reporting to FCA via FORM H.
+
+Your advisers: ${state.advisers.length} configured · ${state.advisers.filter(a=>a.smcrRole).length} with SMF role recorded.`},
+  {id:'fscs',match:/fscs|compensation scheme/i,answer:()=>`**FSCS · Financial Services Compensation Scheme:**
+
+- IFA investment claims compensation limit: **£85,000** per person per failed firm.
+- Levy: paid annually, invoiced by FCA in July/August alongside periodic fee.
+- Levy class for IFAs: **SC02** (Life Distribution & Investment Intermediation).
+- Recent annual SC02 levies have ranged £130m-£330m across the class — your firm's share scales with eligible income reported on RMAR.
+
+Track FSCS levy in the Expenses tab as a separate line so you can see the year-on-year cost trend.`},
+];
+async function answerQuestion(q){
+  for(const r of T0_RULES){if(r.match.test(q))return{src:'T0 · UK IFA rules engine',text:r.answer()}}
+  const tier=await Cascade.detectTier();
+  if(tier!=='T0'){
+    const ctx=`Firm: ${state.firm?.name||'(not set)'} · FCA ref ${state.firm?.fcaRefNo||'(n/a)'}
+Advisers: ${state.advisers.length} · Clients: ${state.clients.length}
+YTD fees: ${money(ytdFees())} · MTD fees: ${money(mtdFees())}
+CASS held: ${money(cassTotalHeld())} · last reconciled ${daysSinceReconciliation()}d ago
+PI expires: ${state.firm?.piExpiresAt?isoDate(state.firm.piExpiresAt):'(unset)'}
+Monthly fixed accruals: ${money(expectedFixedCostMonthly())}`;
+    const sys=`You are FallPractice, a sovereign UK IFA firm-accounting tool. You support firm-side admin: fees, CASS, PI, FCA, P&L. You are NOT a regulatory submission system — FCA RegData remains the firm's responsibility. Always be concrete, cite £ amounts, prefer UK terminology, end with 'Verify with your compliance consultant before acting.'
+
+Firm context:
+${ctx}`;
+    const r=await Cascade.generate(sys,q,1200);
+    if(r.text)return{src:r.tier,text:r.text};
+  }
+  return{src:'T0 · fallback',text:`No rule match. Try: "what is CASS?", "is adviser advice VAT-exempt?", "how often must I reconcile client money?", "when is the FCA fee due?", "what is the PI minimum cover?", "RegData submission window".
+
+Or add an API key in Settings for grounded answers.`};
+}
+
+// ═══════════════════════ RENDER ═══════════════════════
+function render(){
+  renderTabs();
+  const v=$('#view');
+  let html='<div class="disclaimer"><strong>FallPractice</strong> supports firm-side accounting for UK financial-advisory practices. It is a tool, not a regulatory submission system; FCA RegData / GABRIEL submissions remain the firm\'s responsibility. Sovereign — data never leaves the device. Audit chain '+(state.settings.auditChain?'<strong>ON</strong>':'OFF')+' · '+state.audit.length+' entries.</div>';
+  const t=state.active;
+  if(t==='dashboard')html+=viewDashboard();
+  else if(t==='fees')html+=viewFees();
+  else if(t==='schedules')html+=viewSchedules();
+  else if(t==='clients')html+=viewClients();
+  else if(t==='advisers')html+=viewAdvisers();
+  else if(t==='cass')html+=viewCass();
+  else if(t==='firm-pl')html+=viewFirmPL();
+  else if(t==='expenses')html+=viewExpenses();
+  else if(t==='regdata')html+=viewRegData();
+  else if(t==='qa')html+=viewQA();
+  v.innerHTML=html;
+  if(t==='qa')scrollChatBottom();
+}
+function renderTabs(){
+  $('#tabNav').innerHTML=TABS.map(t=>`<button class="${t.id===state.active?'active':''}" onclick="switchTab('${t.id}')">${esc(t.label)}</button>`).join('');
+}
+async function switchTab(id){state.active=id;await saveState();render()}
+
+// ─── views ───
+function viewDashboard(){
+  const fbm=feesByMonth(6);
+  const fbtMap=feesByType();
+  const maxMonth=Math.max(...fbm.map(m=>m.total),1);
+  const colors={initial:'#b8974a',ongoing:'#4ade80','one-off':'#60a5fa',transactional:'#fbbf24','trail-commission':'#ff8c00'};
+  const overdue=state.feeLedger.filter(f=>f.status==='invoiced'&&f.ts<now()-14*dayMs);
+  const totalReceivable=state.feeLedger.filter(f=>f.status==='invoiced').reduce((a,f)=>a+(f.net||0),0);
+  const cassEntries=cassUnreconciled();
+  const days=daysSinceReconciliation();
+  const cassTone=days>RULES.cassRedDays?'red':days>RULES.cassAmberDays?'amber':'green';
+  const piD=piDaysToExpiry();
+  const piTone=piD===null?'muted':piD<30?'red':piD<60?'amber':'green';
+  return `
+  <div class="section-h"><h2>Firm dashboard</h2><div class="sub">${esc(state.firm?.name||'(firm unset · open Settings)')} · ${TAX_YEAR}</div></div>
+  <div class="grid">
+    <div class="card"><h3>Headline KPIs</h3>
+      <div class="kpi"><span class="l">YTD fees (calendar)</span><span class="v brass">${money(ytdFees())}</span></div>
+      <div class="kpi"><span class="l">MTD fees</span><span class="v">${money(mtdFees())}</span></div>
+      <div class="kpi"><span class="l">Receivable (invoiced, not yet received)</span><span class="v amber">${money(totalReceivable)}</span></div>
+      <div class="kpi"><span class="l">Overdue >14d</span><span class="v ${overdue.length?'red':''}">${overdue.length} · ${money(overdue.reduce((a,f)=>a+(f.net||0),0))}</span></div>
+      <div class="kpi"><span class="l">Clients · advisers</span><span class="v">${state.clients.filter(c=>!c.archivedAt).length} · ${state.advisers.filter(a=>a.status==='active').length}</span></div>
+      <div class="kpi"><span class="l">Expected fixed cost / mo</span><span class="v">${money(expectedFixedCostMonthly())}</span></div>
+    </div>
+    <div class="card"><h3>Last 6 months · fee revenue</h3>
+      <div class="barchart">
+        ${fbm.map(m=>{
+          const types=['initial','ongoing','one-off','transactional','trail-commission'];
+          const totalH=Math.round((m.total/maxMonth)*120);
+          return `<div class="b"><div class="bar2" style="height:${totalH}px" title="${m.month} · ${money(m.total)}">
+            ${types.map(t=>{const v=m[t]||0;if(!v)return '';const h=Math.round((v/maxMonth)*120);return `<div class="seg" style="background:${colors[t]};height:${h}px" title="${t}: ${money(v)}"></div>`}).join('')}
+          </div><div class="lab">${m.month.slice(2)}</div></div>`;
+        }).join('')}
+      </div>
+      <div class="legend">${Object.entries(colors).map(([k,c])=>`<span><span class="sw" style="background:${c}"></span>${k}</span>`).join('')}</div>
+    </div>
+    <div class="card"><h3>CASS posture</h3>
+      <div class="kpi"><span class="l">Total client money held</span><span class="v brass">${money(cassTotalHeld())}</span></div>
+      <div class="kpi"><span class="l">Unreconciled entries</span><span class="v ${cassEntries.length?'red':''}">${cassEntries.length}</span></div>
+      <div class="kpi"><span class="l">Days since reconciliation</span><span class="v ${cassTone}">${days===999?'never':days}</span></div>
+      <button class="btn sm" onclick="switchTab('cass')">open CASS</button>
+    </div>
+    <div class="card"><h3>PI insurance</h3>
+      <div class="kpi"><span class="l">Insurer / policy</span><span class="v">${esc(state.firm?.piInsurer||'-')} / ${esc(state.firm?.piPolicyNo||'-')}</span></div>
+      <div class="kpi"><span class="l">Expires</span><span class="v ${piTone}">${state.firm?.piExpiresAt?isoDate(state.firm.piExpiresAt):'(not set)'}</span></div>
+      <div class="kpi"><span class="l">Days to renewal</span><span class="v ${piTone}">${piD===null?'-':piD}</span></div>
+      <div class="kpi"><span class="l">Monthly accrual</span><span class="v">${money(piMonthlyAccrual())}</span></div>
+    </div>
+    <div class="card"><h3>By type · all time</h3>
+      ${Object.entries(fbtMap).map(([k,v])=>`<div class="kpi"><span class="l">${k}</span><span class="v">${money(v)}</span></div>`).join('')}
+    </div>
+    <div class="card"><h3>Quick actions</h3>
+      <button class="btn primary sm" onclick="openModal('newFee')">+ record fee</button>
+      <button class="btn sm" onclick="openModal('newSchedule')">+ recurring schedule</button>
+      <button class="btn sm" onclick="openModal('cassEntry')">+ CASS entry</button>
+      <button class="btn sm" onclick="reconcileNow()">reconcile now</button>
+      <button class="btn sm" onclick="openModal('newClient')">+ client</button>
+      <button class="btn sm" onclick="openModal('newAdviser')">+ adviser</button>
+      <button class="btn sm" onclick="openModal('newExpense')">+ expense</button>
+    </div>
+  </div>`;
+}
+function viewFees(){
+  const fees=state.feeLedger.slice().sort((a,b)=>b.ts-a.ts);
+  return `
+  <div class="section-h"><h2>Fee ledger</h2><div class="actions">
+    <button class="btn sm" onclick="exportLedger()">↓ CSV</button>
+    <button class="btn primary sm" onclick="openModal('newFee')">+ record fee</button>
+  </div></div>
+  <div class="card">
+    ${fees.length?`<table><thead><tr><th>Date</th><th>Client</th><th>Adviser</th><th>Type</th><th>Description</th><th class="r">Gross</th><th class="r">VAT</th><th class="r">Net</th><th>Status</th><th></th></tr></thead><tbody>
+    ${fees.map(f=>{
+      const cl=state.clients.find(c=>c.id===f.clientId);
+      const adv=state.advisers.find(a=>a.id===f.adviserId);
+      const stClass=f.status==='received'?'green':f.status==='overdue'||(f.status==='invoiced'&&f.ts<now()-14*dayMs)?'red':f.status==='written-off'?'muted':'amber';
+      return `<tr><td class="mono">${isoDate(f.ts)}</td>
+        <td>${esc(cl?cl.firstName+' '+cl.lastName:'(unknown)')}</td>
+        <td>${esc(adv?adv.name:'(unknown)')}</td>
+        <td><span class="tag">${esc(f.type)}</span></td>
+        <td style="font-size:12px">${esc(f.description||'')}</td>
+        <td class="r">${moneyP(f.gross)}</td>
+        <td class="r">${f.vat?moneyP(f.vat):'-'}</td>
+        <td class="r" style="color:var(--brass);font-weight:600">${moneyP(f.net)}</td>
+        <td><span class="tag ${stClass}">${esc(f.status)}</span></td>
+        <td><button class="btn sm" onclick="openFee('${f.id}')">view</button></td></tr>`;
+    }).join('')}
+    <tr class="total"><td colspan="5">Total</td><td class="r">${moneyP(fees.reduce((a,f)=>a+(f.gross||0),0))}</td><td class="r">${moneyP(fees.reduce((a,f)=>a+(f.vat||0),0))}</td><td class="r">${moneyP(fees.reduce((a,f)=>a+(f.net||0),0))}</td><td></td><td></td></tr>
+    </tbody></table>`:`<div class="empty">No fees recorded. Click + record fee.</div>`}
+  </div>`;
+}
+function viewSchedules(){
+  const sched=state.feeSchedules.slice().sort((a,b)=>a.nextDueAt-b.nextDueAt);
+  return `
+  <div class="section-h"><h2>Recurring schedules</h2><div class="actions">
+    <button class="btn primary sm" onclick="openModal('newSchedule')">+ schedule</button>
+    <button class="btn sm" onclick="runScheduleCronNow()">run cron now</button>
+  </div></div>
+  <div class="card">
+    ${sched.length?`<table><thead><tr><th>Client</th><th>Adviser</th><th>Freq</th><th class="r">Amount</th><th>Description</th><th>Next due</th><th>Active</th><th></th></tr></thead><tbody>
+    ${sched.map(s=>{
+      const cl=state.clients.find(c=>c.id===s.clientId);
+      const adv=state.advisers.find(a=>a.id===s.adviserId);
+      const dueClass=s.nextDueAt<now()?'red':daysBetween(now(),s.nextDueAt)<7?'amber':'';
+      return `<tr><td>${esc(cl?cl.firstName+' '+cl.lastName:'-')}</td>
+        <td>${esc(adv?adv.name:'-')}</td>
+        <td><span class="tag">${esc(s.frequency)}</span></td>
+        <td class="r">${moneyP(s.amount)}</td>
+        <td style="font-size:12px">${esc(s.description||'')}</td>
+        <td class="mono ${dueClass}" style="color:${dueClass==='red'?'var(--red)':dueClass==='amber'?'var(--amber)':'inherit'}">${isoDate(s.nextDueAt)}</td>
+        <td><span class="tag ${s.active?'green':'muted'}">${s.active?'active':'paused'}</span></td>
+        <td><button class="btn sm" onclick="toggleSchedule('${s.id}')">${s.active?'pause':'resume'}</button>
+        <button class="btn sm danger" onclick="deleteSchedule('${s.id}')">x</button></td></tr>`;
+    }).join('')}</tbody></table>`:`<div class="empty">No schedules. Recurring fees auto-generate on tool open when nextDueAt is in the past.</div>`}
+  </div>`;
+}
+function viewClients(){
+  const sel=state.clients.find(c=>c.id===state.selectedClientId);
+  const list=state.clients.filter(c=>!c.archivedAt).sort((a,b)=>(a.lastName||'').localeCompare(b.lastName||''));
+  return `
+  <div class="section-h"><h2>Clients</h2><div class="actions">
+    <button class="btn primary sm" onclick="openModal('newClient')">+ client</button>
+  </div></div>
+  <div class="grid2">
+    <div class="card"><h3>List · ${list.length}</h3>
+      ${list.length?`<table><tbody>${list.map(c=>`<tr class="clickable ${c.id===state.selectedClientId?'':''}" onclick="selectClient('${c.id}')">
+        <td><strong>${esc((c.firstName||'')+' '+(c.lastName||''))}</strong><div style="font-size:11px;color:var(--cream-muted)">${esc(c.email||'')}</div></td>
+        <td class="r" style="font-size:11px">${money(clientLifetimeFees(c.id))}</td>
+        <td><span class="tag ${c.kyc?.status==='verified'?'green':'amber'}" style="font-size:9px">${esc(c.kyc?.status||'-')}</span></td>
+      </tr>`).join('')}</tbody></table>`:`<div class="empty">No clients. Add one or wait for sync from FallOnboard.</div>`}
+    </div>
+    <div class="card"><h3>Detail</h3>
+      ${sel?renderClientDetail(sel):`<div class="empty">Select a client to see fee history.</div>`}
+    </div>
+  </div>`;
+}
+function renderClientDetail(c){
+  const fees=feesForClient(c.id).sort((a,b)=>b.ts-a.ts);
+  const ongoing=fees.filter(f=>f.type==='ongoing'&&f.ts>now()-365*dayMs);
+  const ongoingRate=ongoing.length?ongoing.reduce((a,f)=>a+(f.net||0),0):0;
+  const last=lastInvoiceForClient(c.id);
+  const next=nextDueForClient(c.id);
+  const riy=clientRIY(c);
+  const pv=clientPortfolioValue(c);
+  return `
+    <div class="kpi"><span class="l">Name</span><span class="v">${esc((c.firstName||'')+' '+(c.lastName||''))}</span></div>
+    <div class="kpi"><span class="l">Email</span><span class="v" style="font-size:11px">${esc(c.email||'-')}</span></div>
+    <div class="kpi"><span class="l">Adviser</span><span class="v">${esc(state.advisers.find(a=>a.id===c.adviserId)?.name||'-')}</span></div>
+    <div class="kpi"><span class="l">Engagement</span><span class="v">${esc(c.engagement?.type||'-')} · ${esc(c.engagement?.feeBasis||'-')}</span></div>
+    <div class="kpi"><span class="l">Lifetime fees received</span><span class="v brass">${money(clientLifetimeFees(c.id))}</span></div>
+    <div class="kpi"><span class="l">YTD fees</span><span class="v">${money(clientYtdFees(c.id))}</span></div>
+    <div class="kpi"><span class="l">Ongoing-fee run-rate (12m)</span><span class="v">${money(ongoingRate)}</span></div>
+    <div class="kpi"><span class="l">Last invoice</span><span class="v">${last?isoDate(last.ts)+' · '+money(last.net):'-'}</span></div>
+    <div class="kpi"><span class="l">Next due (schedule)</span><span class="v">${next?isoDate(next):'-'}</span></div>
+    <div class="kpi"><span class="l">Portfolio value</span><span class="v">${money(pv)}</span></div>
+    <div class="kpi"><span class="l">RIY (ongoing / pv)</span><span class="v ${riy>0.015?'amber':'green'}">${riy?pct(riy):'-'}</span></div>
+    <div style="margin-top:10px"><button class="btn sm" onclick="openModal('newFeeFor:${c.id}')">+ fee for this client</button>
+    <button class="btn sm" onclick="requestPortfolioFromFallAdviser('${c.id}')">refresh portfolio · FallAdviser</button></div>
+    ${fees.length?`<table style="margin-top:10px"><thead><tr><th>Date</th><th>Type</th><th class="r">Net</th><th>Status</th></tr></thead><tbody>
+    ${fees.slice(0,12).map(f=>`<tr><td class="mono" style="font-size:11px">${isoDate(f.ts)}</td><td><span class="tag" style="font-size:9px">${esc(f.type)}</span></td><td class="r">${moneyP(f.net)}</td><td><span class="tag ${f.status==='received'?'green':'amber'}" style="font-size:9px">${esc(f.status)}</span></td></tr>`).join('')}
+    </tbody></table>`:''}`;
+}
+function viewAdvisers(){
+  const sel=state.advisers.find(a=>a.id===state.selectedAdviserId);
+  const list=state.advisers.filter(a=>!a.archivedAt).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+  const firmTotal=totalFirmRevenue();
+  return `
+  <div class="section-h"><h2>Advisers · P&L</h2><div class="actions">
+    <button class="btn primary sm" onclick="openModal('newAdviser')">+ adviser</button>
+  </div></div>
+  <div class="grid2">
+    <div class="card"><h3>List · ${list.length}</h3>
+      ${list.length?`<table><tbody>${list.map(a=>{
+        const att=feesForAdviser(a.id).reduce((s,x)=>s+x.attributable,0);
+        return `<tr class="clickable" onclick="selectAdviser('${a.id}')"><td><strong>${esc(a.name)}</strong><div style="font-size:11px;color:var(--cream-muted)">${esc(a.smcrRole||'-')} · ${esc(a.fcaRefNo||'-')}</div></td>
+        <td class="r" style="font-size:11px">${money(att)}</td>
+        <td><span class="tag ${a.status==='active'?'green':'muted'}" style="font-size:9px">${esc(a.status)}</span></td></tr>`;
+      }).join('')}</tbody></table>`:`<div class="empty">No advisers. Add one.</div>`}
+    </div>
+    <div class="card"><h3>Detail</h3>
+      ${sel?renderAdviserDetail(sel,firmTotal):`<div class="empty">Select an adviser.</div>`}
+    </div>
+  </div>`;
+}
+function renderAdviserDetail(a,firmTotal){
+  const entries=feesForAdviser(a.id);
+  const total=entries.reduce((s,x)=>s+x.attributable,0);
+  const ytd=entries.filter(x=>new Date(x.fee.ts).getFullYear()===new Date().getFullYear()).reduce((s,x)=>s+x.attributable,0);
+  const mtd=entries.filter(x=>monthKey(x.fee.ts)===monthKey(now())).reduce((s,x)=>s+x.attributable,0);
+  const clientCount=new Set(entries.map(x=>x.fee.clientId)).size;
+  const aum=state.clients.filter(c=>c.adviserId===a.id&&!c.archivedAt).reduce((s,c)=>s+clientPortfolioValue(c),0);
+  const byType={};for(const e of entries){const t=e.fee.type;byType[t]=(byType[t]||0)+e.attributable}
+  const colors={initial:'#b8974a',ongoing:'#4ade80','one-off':'#60a5fa',transactional:'#fbbf24','trail-commission':'#ff8c00'};
+  const max=Math.max(...Object.values(byType),1);
+  return `
+    <div class="kpi"><span class="l">Name · role</span><span class="v">${esc(a.name)} · ${esc(a.smcrRole||'-')}</span></div>
+    <div class="kpi"><span class="l">FCA ref</span><span class="v mono">${esc(a.fcaRefNo||'-')}</span></div>
+    <div class="kpi"><span class="l">Attributable fees · all time</span><span class="v brass">${money(total)}</span></div>
+    <div class="kpi"><span class="l">YTD</span><span class="v">${money(ytd)}</span></div>
+    <div class="kpi"><span class="l">MTD</span><span class="v">${money(mtd)}</span></div>
+    <div class="kpi"><span class="l">Clients under advice</span><span class="v">${clientCount}</span></div>
+    <div class="kpi"><span class="l">AUM under advice</span><span class="v">${money(aum)}</span></div>
+    <div class="kpi"><span class="l">% of firm fees</span><span class="v">${firmTotal?pct(total/firmTotal):'-'}</span></div>
+    <div style="margin-top:14px">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--brass);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px">Fees by type</div>
+      <div class="barchart" style="height:100px">
+        ${Object.entries(byType).map(([t,v])=>`<div class="b"><div class="bar2" style="height:${Math.round((v/max)*80)}px;background:${colors[t]||'var(--brass)'};border-radius:2px"></div><div class="lab">${esc(t)}</div><div style="font-family:var(--mono);font-size:10px;color:var(--cream-dim)">${money(v)}</div></div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+function viewCass(){
+  const entries=state.cassEntries.slice().sort((a,b)=>b.ts-a.ts);
+  const days=daysSinceReconciliation();
+  const tone=days>RULES.cassRedDays?'red':days>RULES.cassAmberDays?'amber':'green';
+  return `
+  <div class="section-h"><h2>CASS client money</h2><div class="actions">
+    <button class="btn sm" onclick="reconcileNow()">+ reconcile now</button>
+    <button class="btn primary sm" onclick="openModal('cassEntry')">+ entry</button>
+  </div></div>
+  <div class="grid">
+    <div class="card"><h3>Posture</h3>
+      <div class="kpi"><span class="l">Total client money held</span><span class="v brass">${money(cassTotalHeld())}</span></div>
+      <div class="kpi"><span class="l">Days since reconciliation</span><span class="v ${tone}">${days===999?'never':days}</span></div>
+      <div class="kpi"><span class="l">Unreconciled entries</span><span class="v ${cassUnreconciled().length?'red':''}">${cassUnreconciled().length}</span></div>
+      <div class="kpi"><span class="l">Amber / Red threshold</span><span class="v">${RULES.cassAmberDays}d · ${RULES.cassRedDays}d</span></div>
+    </div>
+    <div class="card"><h3>About</h3>
+      <p style="font-size:12px;color:var(--cream-dim)">FallPractice tracks the ledger of receipts, segregations, disbursements and reconciliations — it does not move money. The bank account stays with your bank. Use this to evidence CASS 7.13 daily reconciliation discipline.</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    ${entries.length?`<table><thead><tr><th>Date</th><th>Type</th><th>Client</th><th>Account</th><th class="r">Amount</th><th>Notes</th><th>Reconciled</th><th></th></tr></thead><tbody>
+    ${entries.map(e=>{
+      const cl=state.clients.find(c=>c.id===e.clientId);
+      return `<tr><td class="mono">${isoDate(e.ts)}</td>
+        <td><span class="tag">${esc(e.type)}</span></td>
+        <td>${esc(cl?cl.firstName+' '+cl.lastName:'-')}</td>
+        <td><span class="tag ${e.account==='cass'?'blue':'muted'}">${esc(e.account)}</span></td>
+        <td class="r">${e.amount?moneyP(e.amount):'-'}</td>
+        <td style="font-size:11px">${esc(e.notes||'')}</td>
+        <td>${e.reconciledAt?isoDate(e.reconciledAt):'-'}</td>
+        <td>${e.type!=='reconciliation'&&!e.reconciledAt?`<button class="btn sm" onclick="markReconciled('${e.id}')">mark</button>`:''}</td></tr>`;
+    }).join('')}</tbody></table>`:`<div class="empty">No CASS entries. Add receipts, segregations, disbursements + a daily reconciliation.</div>`}
+  </div>`;
+}
+function viewFirmPL(){
+  const m=monthKey(now());
+  const monthRev=totalFirmRevenue({month:m});
+  const prevMonth=monthKey(new Date(new Date().getFullYear(),new Date().getMonth()-1,1).getTime());
+  const prevRev=totalFirmRevenue({month:prevMonth});
+  const y=new Date().getFullYear();
+  const yearRev=totalFirmRevenue({year:y});
+  const prevYearRev=totalFirmRevenue({year:y-1});
+  const monthExp=expensesTotal(m);
+  const accrual=expectedFixedCostMonthly();
+  const monthNet=monthRev-monthExp-accrual;
+  const byType=feesByType();
+  return `
+  <div class="section-h"><h2>Firm P&L</h2><div class="actions">
+    <button class="btn sm" onclick="exportFirmPL()">↓ markdown summary</button>
+  </div></div>
+  <div class="grid">
+    <div class="card"><h3>This month · ${m}</h3>
+      <div class="kpi"><span class="l">Revenue</span><span class="v brass">${money(monthRev)}</span></div>
+      <div class="kpi"><span class="l">Recorded expenses</span><span class="v red">-${money(monthExp)}</span></div>
+      <div class="kpi"><span class="l">Accruals (PI · FCA · ProfBody)</span><span class="v red">-${money(accrual)}</span></div>
+      <div class="kpi"><span class="l">Net</span><span class="v ${monthNet>=0?'green':'red'}">${money(monthNet)}</span></div>
+    </div>
+    <div class="card"><h3>Comparisons</h3>
+      <div class="kpi"><span class="l">Previous month · ${prevMonth}</span><span class="v">${money(prevRev)}</span></div>
+      <div class="kpi"><span class="l">MoM change</span><span class="v ${monthRev>=prevRev?'green':'red'}">${prevRev?pct((monthRev-prevRev)/prevRev):'-'}</span></div>
+      <div class="kpi"><span class="l">${y} YTD</span><span class="v">${money(yearRev)}</span></div>
+      <div class="kpi"><span class="l">${y-1} full year</span><span class="v">${money(prevYearRev)}</span></div>
+      <div class="kpi"><span class="l">YoY change</span><span class="v ${yearRev>=prevYearRev?'green':'red'}">${prevYearRev?pct((yearRev-prevYearRev)/prevYearRev):'-'}</span></div>
+    </div>
+    <div class="card"><h3>Revenue by type · ${y}</h3>
+      ${Object.entries(byType).map(([k,v])=>`<div class="kpi"><span class="l">${k}</span><span class="v">${money(v)}</span></div>`).join('')}
+    </div>
+    <div class="card"><h3>VAT</h3>
+      <div class="kpi"><span class="l">Current quarter VAT collected</span><span class="v">${money(vatTotalQuarter().vat)}</span></div>
+      <div class="kpi"><span class="l">Quarter</span><span class="v">${vatTotalQuarter().quarter}</span></div>
+      <div class="kpi"><span class="l">Firm VAT-reg threshold</span><span class="v">${money(RULES.vatRegThreshold)} turnover</span></div>
+      <p style="font-size:11px;color:var(--cream-muted);margin-top:8px">Most adviser fees are VAT-exempt. Per-entry VAT lives in the fee ledger. MTD-shaped export available below.</p>
+      <button class="btn sm" onclick="exportVATQuarter()">↓ VAT quarter</button>
+    </div>
+  </div>`;
+}
+function viewExpenses(){
+  const m=monthKey(now());
+  const exp=expensesForMonth(m).slice().sort((a,b)=>(a.type||'').localeCompare(b.type||''));
+  return `
+  <div class="section-h"><h2>Expenses</h2><div class="sub">${esc(m)}</div><div class="actions">
+    <button class="btn primary sm" onclick="openModal('newExpense')">+ expense</button>
+    <button class="btn sm" onclick="seedMonthlyAccruals()">seed monthly accruals</button>
+  </div></div>
+  <div class="card">
+    <div class="kpi"><span class="l">PI monthly accrual (set in Settings)</span><span class="v">${money(piMonthlyAccrual())}</span></div>
+    <div class="kpi"><span class="l">FCA monthly accrual</span><span class="v">${money(fcaMonthlyAccrual())}</span></div>
+    <div class="kpi"><span class="l">Professional body accrual</span><span class="v">${money(profBodyMonthlyAccrual())}</span></div>
+    <div class="kpi"><span class="l">Recorded for month</span><span class="v">${money(expensesTotal(m))}</span></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    ${exp.length?`<table><thead><tr><th>Type</th><th>Notes</th><th class="r">Amount</th><th></th></tr></thead><tbody>
+    ${exp.map(e=>`<tr><td>${esc(e.type)}</td><td style="font-size:11px">${esc(e.notes||'')}</td><td class="r">${moneyP(e.amount)}</td><td><button class="btn sm danger" onclick="deleteExpense('${e.id}')">x</button></td></tr>`).join('')}
+    <tr class="total"><td colspan="2">Total this month</td><td class="r">${moneyP(expensesTotal(m))}</td><td></td></tr>
+    </tbody></table>`:`<div class="empty">No expenses for ${m}. Use seed-monthly-accruals to drop PI/FCA/ProfBody accruals in.</div>`}
+  </div>`;
+}
+function viewRegData(){
+  const next=nextRMARWindow();
+  return `
+  <div class="section-h"><h2>RegData (formerly GABRIEL)</h2><div class="sub">FCA half-yearly RMAR · hint dashboard only</div></div>
+  <div class="grid">
+    <div class="card"><h3>Next RMAR window</h3>
+      <div class="kpi"><span class="l">Period end</span><span class="v brass">${next.periodEnd}</span></div>
+      <div class="kpi"><span class="l">Submission opens</span><span class="v">${next.opens}</span></div>
+      <div class="kpi"><span class="l">Submission due by</span><span class="v ${next.daysToDue<14?'amber':''}">${next.due} (${next.daysToDue}d)</span></div>
+      <p style="font-size:11px;color:var(--cream-muted);margin-top:8px">FallPractice is a reminder + checklist. The actual submission happens on the FCA RegData portal. Late submission: £250 fixed penalty.</p>
+    </div>
+    <div class="card"><h3>What to gather</h3>
+      <ul class="checklist">
+        <li><input type="checkbox"> Income breakdown by activity (initial · ongoing · transactional)</li>
+        <li><input type="checkbox"> Number of clients · new / lapsed</li>
+        <li><input type="checkbox"> Total funds under management</li>
+        <li><input type="checkbox"> Capital adequacy figures (FSA002 if applicable)</li>
+        <li><input type="checkbox"> PI cover details + excess</li>
+        <li><input type="checkbox"> Number of advisers / certified persons</li>
+        <li><input type="checkbox"> Complaints data (count + outcomes)</li>
+        <li><input type="checkbox"> Client money + CASS audit confirmation</li>
+        <li><input type="checkbox"> Any DB/SIPP/pension-transfer business done in period</li>
+        <li><input type="checkbox"> Board sign-off + 4-eyes review</li>
+      </ul>
+    </div>
+    <div class="card"><h3>Snapshot · pre-filled</h3>
+      <div class="kpi"><span class="l">Reporting fees recorded</span><span class="v">${money(totalFirmRevenue({}))}</span></div>
+      <div class="kpi"><span class="l">Active clients</span><span class="v">${state.clients.filter(c=>!c.archivedAt).length}</span></div>
+      <div class="kpi"><span class="l">Active advisers</span><span class="v">${state.advisers.filter(a=>a.status==='active').length}</span></div>
+      <div class="kpi"><span class="l">AUM (sum of portfolioValue)</span><span class="v">${money(state.clients.filter(c=>!c.archivedAt).reduce((a,c)=>a+clientPortfolioValue(c),0))}</span></div>
+      <div class="kpi"><span class="l">Client money held (CASS)</span><span class="v">${money(cassTotalHeld())}</span></div>
+      <button class="btn sm" onclick="exportRMARSnapshot()">↓ RMAR snapshot · markdown</button>
+    </div>
+  </div>`;
+}
+function nextRMARWindow(){
+  // RMAR periods end 30 June + 31 December · due 30 working days after
+  const d=new Date();const yr=d.getFullYear();
+  const jun30=new Date(yr,5,30).getTime();
+  const dec31=new Date(yr,11,31).getTime();
+  let pEnd;
+  if(d.getTime()<=jun30+30*dayMs)pEnd=jun30;
+  else if(d.getTime()<=dec31+30*dayMs)pEnd=dec31;
+  else pEnd=new Date(yr+1,5,30).getTime();
+  const opens=pEnd+dayMs;
+  // 30 working days ≈ 42 calendar days
+  const due=pEnd+42*dayMs;
+  return {periodEnd:isoDate(pEnd),opens:isoDate(opens),due:isoDate(due),daysToDue:daysBetween(now(),due)};
+}
+function viewQA(){
+  const chat=state.chat||[];
+  return `
+  <div class="section-h"><h2>Q&A · firm rules</h2><div class="sub">T0 rules engine · T3 BYOK fallback</div></div>
+  <div class="card">
+    <div class="chat" id="chatScroll">
+      ${chat.length?chat.map(m=>m.role==='user'?`<div class="msg user">${esc(m.text)}</div>`:`<div class="msg bot">${formatBotText(m.text)}<div class="src">${esc(m.src||'')}</div></div>`).join(''):`<div class="empty">Ask: "what is CASS?", "is adviser advice VAT-exempt?", "how often must I reconcile?", "when is the FCA fee due?", "what is PI minimum cover?", "RegData submission window".</div>`}
+    </div>
+    <div class="chat-input">
+      <input type="text" id="qInput" placeholder="ask the firm-rules engine..." onkeypress="if(event.key==='Enter')askQA()">
+      <button class="btn primary" onclick="askQA()">ask</button>
+    </div>
+  </div>`;
+}
+function formatBotText(t){return esc(t).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code style="background:var(--ink);padding:1px 5px;border-radius:2px;font-size:11px">$1</code>').replace(/\n/g,'<br>')}
+function scrollChatBottom(){const c=$('#chatScroll');if(c)c.scrollTop=c.scrollHeight}
+
+async function askQA(){
+  const inp=$('#qInput');const q=(inp.value||'').trim();if(!q)return;
+  state.chat.push({role:'user',text:q,ts:now()});inp.value='';render();
+  const ans=await answerQuestion(q);
+  state.chat.push({role:'bot',text:ans.text,src:ans.src,ts:now()});
+  await saveState();render();
+}
+
+// ─── Selection + simple actions ───
+async function selectClient(id){state.selectedClientId=id;await saveState();render()}
+async function selectAdviser(id){state.selectedAdviserId=id;await saveState();render()}
+async function toggleSchedule(id){const s=state.feeSchedules.find(x=>x.id===id);if(!s)return;s.active=!s.active;await idbPut('feeSchedules',s);await appendAudit('schedule.toggle','User toggled schedule',{id,active:s.active});render()}
+async function deleteSchedule(id){if(!confirm('Delete schedule?'))return;state.feeSchedules=state.feeSchedules.filter(x=>x.id!==id);await idbDel('feeSchedules',id);await appendAudit('schedule.deleted','User deleted',{id});render()}
+async function deleteExpense(id){if(!confirm('Delete expense?'))return;state.expenses=state.expenses.filter(x=>x.id!==id);await idbDel('expenses',id);render()}
+async function markReconciled(id){const e=state.cassEntries.find(x=>x.id===id);if(!e)return;e.reconciledAt=now();await idbPut('cassEntries',e);await appendAudit('cass.reconciled','Marked entry reconciled',{id});toast('reconciled');render()}
+async function reconcileNow(){const e={id:'ce_'+uid(),clientId:'',ts:now(),dateOf:isoDate(now()),type:'reconciliation',amount:0,account:'cass',notes:'Daily reconciliation · '+isoDate(now()),reconciledAt:now()};state.cassEntries.push(e);// also mark all open entries reconciled
+  for(const ce of state.cassEntries){if(ce.type!=='reconciliation'&&!ce.reconciledAt){ce.reconciledAt=now();await idbPut('cassEntries',ce)}}
+  await idbPut('cassEntries',e);await appendAudit('cass.daily.reconciliation','User pressed reconcile now',{id:e.id});toast('reconciled');render();
+}
+async function runScheduleCronNow(){await runScheduleCron();render()}
+
+function openFee(id){const f=state.feeLedger.find(x=>x.id===id);if(!f)return;openModal('feeDetail:'+id)}
+function requestPortfolioFromFallAdviser(clientId){try{if(chFallClient){chFallClient.postMessage({v:1,type:'portfolio.request',ts:now(),source:TOOLNAME,payload:{clientId}});toast('requested portfolio from FallAdviser')}}catch(e){toast('mesh unavailable')}}
+
+// ─── Exports ───
+function downloadFile(name,content,mime){const b=new Blob([content],{type:mime||'text/plain'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)}
+function exportLedger(){
+  const head=['id','dateOf','clientName','adviserName','type','basis','description','gross','vat','net','status','invoiceId'];
+  const rows=state.feeLedger.map(f=>{
+    const c=state.clients.find(x=>x.id===f.clientId);
+    const a=state.advisers.find(x=>x.id===f.adviserId);
+    return [f.id,f.dateOf||isoDate(f.ts),c?c.firstName+' '+c.lastName:'',a?a.name:'',f.type,f.basis,(f.description||'').replace(/"/g,'""'),f.gross,f.vat,f.net,f.status,f.invoiceId||''].map(v=>typeof v==='string'?'"'+v+'"':v).join(',');
+  });
+  downloadFile('fallpractice-fee-ledger-'+isoDate(now())+'.csv',[head.join(','),...rows].join('\n'),'text/csv');toast('ledger exported');
+}
+function exportFirmPL(){
+  const m=monthKey(now());const y=new Date().getFullYear();
+  const md=`# Firm P&L · ${esc(state.firm?.name||'')} · ${m}
+
+**Generated:** ${new Date().toLocaleString('en-GB')}
+**Tool:** FallPractice v${VERSION}
+
+## This month (${m})
+- Revenue: **${money(totalFirmRevenue({month:m}))}**
+- Recorded expenses: ${money(expensesTotal(m))}
+- Accruals (PI/FCA/ProfBody): ${money(expectedFixedCostMonthly())}
+- Net: **${money(totalFirmRevenue({month:m})-expensesTotal(m)-expectedFixedCostMonthly())}**
+
+## YTD (${y})
+- Total revenue: ${money(totalFirmRevenue({year:y}))}
+- Prior year: ${money(totalFirmRevenue({year:y-1}))}
+
+## Revenue by type (all-time)
+${Object.entries(feesByType()).map(([k,v])=>`- ${k}: ${money(v)}`).join('\n')}
+
+## Clients · Advisers
+- Active clients: ${state.clients.filter(c=>!c.archivedAt).length}
+- Active advisers: ${state.advisers.filter(a=>a.status==='active').length}
+- AUM (sum of portfolioValue): ${money(state.clients.filter(c=>!c.archivedAt).reduce((a,c)=>a+clientPortfolioValue(c),0))}
+
+## CASS
+- Total client money held: ${money(cassTotalHeld())}
+- Days since reconciliation: ${daysSinceReconciliation()}
+
+---
+*Audit chain entries: ${state.audit.length}. Sovereign — data stays on-device.*`;
+  downloadFile('fallpractice-firm-pl-'+m+'.md',md,'text/markdown');toast('P&L exported');
+}
+function exportVATQuarter(){
+  const q=vatTotalQuarter();
+  const md=`# VAT quarter · ${q.quarter}
+
+VAT collected (sum of \`vat\` field on fee ledger): **${money(q.vat)}**
+
+Most adviser fees are VAT-exempt (intermediation, VATA 1994 Sch 9 Group 5). Standard-rated lines: execution-only, admin, pure reports.
+
+| Date | Client | Description | Gross | VAT | Net |
+|---|---|---|---|---|---|
+${state.feeLedger.filter(f=>{const d=new Date();const m=Math.floor(d.getMonth()/3)*3;const s=new Date(d.getFullYear(),m,1).getTime();const e=new Date(d.getFullYear(),m+3,1).getTime();return f.ts>=s&&f.ts<e&&(f.vat||0)>0}).map(f=>{const c=state.clients.find(x=>x.id===f.clientId);return `| ${isoDate(f.ts)} | ${c?c.firstName+' '+c.lastName:''} | ${(f.description||'').replace(/\|/g,' ')} | ${moneyP(f.gross)} | ${moneyP(f.vat)} | ${moneyP(f.net)} |`}).join('\n')}
+
+*MTD-shaped. Not a substitute for HMRC-compatible MTD software.*`;
+  downloadFile('fallpractice-vat-quarter-'+isoDate(now())+'.md',md,'text/markdown');toast('VAT exported');
+}
+function exportRMARSnapshot(){
+  const n=nextRMARWindow();
+  const md=`# RMAR snapshot · ${esc(state.firm?.name||'')} · period ending ${n.periodEnd}
+
+**Generated:** ${new Date().toLocaleString('en-GB')}
+**Submission due:** ${n.due}
+
+## Section A · Income
+- Total fees recorded: ${money(totalFirmRevenue({}))}
+- Initial: ${money(feesByType().initial||0)}
+- Ongoing: ${money(feesByType().ongoing||0)}
+- Transactional: ${money(feesByType().transactional||0)}
+- Trail commission: ${money(feesByType()['trail-commission']||0)}
+
+## Section B · Business volumes
+- Active clients: ${state.clients.filter(c=>!c.archivedAt).length}
+- AUM (estimated): ${money(state.clients.filter(c=>!c.archivedAt).reduce((a,c)=>a+clientPortfolioValue(c),0))}
+
+## Section C · Staffing
+- Active advisers: ${state.advisers.filter(a=>a.status==='active').length}
+- Advisers with SMF role recorded: ${state.advisers.filter(a=>a.smcrRole).length}
+
+## Section D · PI
+- Insurer: ${esc(state.firm?.piInsurer||'(not set)')}
+- Policy: ${esc(state.firm?.piPolicyNo||'(not set)')}
+- Expires: ${state.firm?.piExpiresAt?isoDate(state.firm.piExpiresAt):'(not set)'}
+
+## Section E · Client money (CASS)
+- Total held: ${money(cassTotalHeld())}
+- Last reconciled: ${lastReconciliation()?isoDate(lastReconciliation().ts):'never'}
+- Unreconciled entries: ${cassUnreconciled().length}
+
+---
+**Reminder:** FallPractice does NOT submit. Use the FCA RegData portal. Cross-check all figures against your accounts before keying in.`;
+  downloadFile('fallpractice-rmar-snapshot-'+isoDate(now())+'.md',md,'text/markdown');toast('RMAR snapshot exported');
+}
+function exportAuditChain(){downloadFile('fallpractice-audit-chain-'+isoDate(now())+'.json',JSON.stringify({schema:'fallpractice-audit@1',exported:new Date().toISOString(),entries:state.audit},null,2),'application/json');toast('audit chain exported')}
+
+// ═══════════════════════ MODALS ═══════════════════════
+function openModal(kind){
+  const wrap=$('#modal');const titleEl=$('#modalTitle');const body=$('#modalBody');
+  if(kind==='settings'){titleEl.textContent='Settings · firm + cascade + audit';body.innerHTML=settingsForm()}
+  else if(kind==='newFee'||kind.startsWith('newFeeFor:')){const clId=kind.startsWith('newFeeFor:')?kind.split(':')[1]:'';titleEl.textContent='Record a fee';body.innerHTML=feeForm(null,clId)}
+  else if(kind.startsWith('feeDetail:')){const f=state.feeLedger.find(x=>x.id===kind.split(':')[1]);if(!f)return;titleEl.textContent='Fee · '+(f.invoiceId||f.id);body.innerHTML=feeDetail(f)}
+  else if(kind==='newSchedule'){titleEl.textContent='Recurring fee schedule';body.innerHTML=scheduleForm()}
+  else if(kind==='newClient'){titleEl.textContent='New client';body.innerHTML=clientForm()}
+  else if(kind==='newAdviser'){titleEl.textContent='New adviser';body.innerHTML=adviserForm()}
+  else if(kind==='cassEntry'){titleEl.textContent='CASS entry';body.innerHTML=cassForm()}
+  else if(kind==='newExpense'){titleEl.textContent='Expense';body.innerHTML=expenseForm()}
+  wrap.classList.add('open');
+}
+function closeModal(){$('#modal').classList.remove('open')}
+function openPalette(){$('#palette').classList.add('open');setTimeout(()=>$('#pInput').focus(),20);$('#pBody').innerHTML='';$('#pInput').value=''}
+function closePalette(){$('#palette').classList.remove('open')}
+
+function settingsForm(){
+  const s=state.settings;const f=state.firm||{};
+  return `
+  <div class="row">
+    <div class="field"><label>Firm name</label><input id="fName" value="${esc(f.name||'')}"></div>
+    <div class="field"><label>Trading name</label><input id="fTrading" value="${esc(f.tradingName||'')}"></div>
+  </div>
+  <div class="row">
+    <div class="field"><label>FCA ref</label><input id="fFCA" value="${esc(f.fcaRefNo||'')}"></div>
+    <div class="field"><label>Companies House #</label><input id="fCH" value="${esc(f.companiesHouseNo||'')}"></div>
+  </div>
+  <div class="row">
+    <div class="field"><label>VAT number</label><input id="fVAT" value="${esc(f.vatNumber||'')}"></div>
+    <div class="field"><label>Professional body</label><input id="fPB" value="${esc(f.professionalBody||'CISI')}"></div>
+  </div>
+  <div class="row">
+    <div class="field"><label>PI insurer</label><input id="fPiI" value="${esc(f.piInsurer||'')}"></div>
+    <div class="field"><label>PI policy #</label><input id="fPiP" value="${esc(f.piPolicyNo||'')}"></div>
+  </div>
+  <div class="row">
+    <div class="field"><label>PI expires (date)</label><input id="fPiE" type="date" value="${f.piExpiresAt?isoDate(f.piExpiresAt):''}"></div>
+    <div class="field"><label>PI annual premium £</label><input id="sPiPrem" type="number" value="${s.piAnnualPremium||0}"></div>
+  </div>
+  <div class="row">
+    <div class="field"><label>FCA annual estimate £</label><input id="sFcaEst" type="number" value="${s.fcaAnnualEstimate||1500}"></div>
+    <div class="field"><label>Prof-body annual £</label><input id="sPbAnn" type="number" value="${s.profBodyAnnual||300}"></div>
+  </div>
+  <div class="field"><label>Bank details for invoices</label><textarea id="sBank" rows="2" placeholder="Sort code · account · ref">${esc(s.bankDetails||'')}</textarea></div>
+
+  <h3 style="font-family:var(--serif);font-size:14px;margin:14px 0 8px;color:var(--brass)">Cascade · BYOK</h3>
+  <div class="row">
+    <div class="field"><label>Anthropic API key</label><input id="stAnth" type="password" value="${esc(s.anthropicKey||'')}" placeholder="sk-ant-..."></div>
+    <div class="field"><label>Gemini API key (free)</label><input id="stGem" type="password" value="${esc(s.geminiKey||'')}"></div>
+  </div>
+  <div class="row">
+    <div class="field"><label>OpenAI API key</label><input id="stOAI" type="password" value="${esc(s.openaiKey||'')}"></div>
+    <div class="field"><label>OpenRouter API key</label><input id="stOR" type="password" value="${esc(s.openrouterKey||'')}"></div>
+  </div>
+  <div class="field" style="margin-top:8px"><label><input type="checkbox" id="stAud" ${s.auditChain?'checked':''}> Mansoor P3 audit chain · prevHash on every write</label></div>
+  <div style="margin-top:10px"><button class="btn sm" onclick="exportAuditChain()">↓ audit-chain.json (${state.audit.length})</button>
+  <button class="btn sm danger" onclick="if(confirm('Wipe all FallPractice data on this device?'))wipeAll()">danger: wipe device data</button></div>
+  <div class="actions"><button class="btn" onclick="closeModal()">cancel</button><button class="btn primary" onclick="saveSettings()">save</button></div>`;
+}
+async function saveSettings(){
+  const f=state.firm||{id:'fm_'+uid(),createdAt:now(),registeredAddress:{}};
+  f.name=$('#fName').value;f.tradingName=$('#fTrading').value;f.fcaRefNo=$('#fFCA').value;f.companiesHouseNo=$('#fCH').value;f.vatNumber=$('#fVAT').value;f.professionalBody=$('#fPB').value;f.piInsurer=$('#fPiI').value;f.piPolicyNo=$('#fPiP').value;
+  const pe=$('#fPiE').value;f.piExpiresAt=pe?new Date(pe).getTime():null;
+  f.updatedAt=now();state.firm=f;await idbPut('firms',f);
+  state.settings.piAnnualPremium=+$('#sPiPrem').value||0;
+  state.settings.fcaAnnualEstimate=+$('#sFcaEst').value||0;
+  state.settings.profBodyAnnual=+$('#sPbAnn').value||0;
+  state.settings.bankDetails=$('#sBank').value;
+  state.settings.anthropicKey=$('#stAnth').value;state.settings.geminiKey=$('#stGem').value;state.settings.openaiKey=$('#stOAI').value;state.settings.openrouterKey=$('#stOR').value;
+  state.settings.auditChain=$('#stAud').checked;
+  Cascade._p=undefined;
+  await saveState();persistSettingsLS();
+  await appendAudit('settings.saved','User saved settings',{firm:f.id});
+  broadcastUpsert('firm.updated',f);
+  updateTierBadge();closeModal();toast('saved');render();
+}
+async function wipeAll(){indexedDB.deleteDatabase(STORE);try{localStorage.removeItem(STORE+'.settings')}catch(e){}location.reload()}
+
+function feeForm(existing,prefillClientId){
+  const e=existing||{};
+  const cl=prefillClientId||e.clientId||state.selectedClientId||(state.clients[0]?.id||'');
+  return `
+  <div class="row">
+    <div class="field"><label>Client</label><select id="ffCl">${state.clients.map(c=>`<option value="${c.id}" ${cl===c.id?'selected':''}>${esc(c.firstName+' '+c.lastName)}</option>`).join('')||'<option value="">(add a client first)</option>'}</select></div>
+    <div class="field"><label>Adviser</label><select id="ffAd">${state.advisers.map(a=>`<option value="${a.id}" ${e.adviserId===a.id?'selected':''}>${esc(a.name)}</option>`).join('')||'<option value="">(add an adviser first)</option>'}</select></div>
+  </div>
+  <div class="row3">
+    <div class="field"><label>Date</label><input id="ffDate" type="date" value="${e.dateOf||isoDate(now())}"></div>
+    <div class="field"><label>Type</label><select id="ffType"><option value="initial">initial</option><option value="ongoing">ongoing</option><option value="one-off">one-off</option><option value="transactional">transactional</option><option value="trail-commission">trail-commission</option></select></div>
+    <div class="field"><label>Basis</label><select id="ffBasis"><option value="flat">flat</option><option value="tiered">tiered</option><option value="AUM%">AUM%</option><option value="hourly">hourly</option><option value="commission">commission</option></select></div>
+  </div>
+  <div class="field"><label>Description</label><input id="ffDesc" placeholder="e.g. Quarterly ongoing fee · 0.75% AUM"></div>
+  <div class="row3">
+    <div class="field"><label>Gross £</label><input id="ffGross" type="number" step="0.01" value="${e.gross||0}"></div>
+    <div class="field"><label>VAT £</label><input id="ffVat" type="number" step="0.01" value="${e.vat||0}"></div>
+    <div class="field"><label>Status</label><select id="ffStatus"><option value="invoiced">invoiced</option><option value="received">received</option><option value="overdue">overdue</option><option value="written-off">written-off</option></select></div>
+  </div>
+  <p style="font-size:11px;color:var(--cream-muted);margin:6px 0">Net auto-calculated as gross − VAT. Most adviser fees are VAT-exempt; set VAT to 0 unless this is an admin/execution-only line.</p>
+  <div class="actions"><button class="btn" onclick="closeModal()">cancel</button><button class="btn primary" onclick="saveFee()">save</button></div>`;
+}
+async function saveFee(){
+  const gross=+$('#ffGross').value||0;const vat=+$('#ffVat').value||0;
+  const f={id:'fl_'+uid(),clientId:$('#ffCl').value,adviserId:$('#ffAd').value,firmId:state.firm?.id||'',ts:new Date($('#ffDate').value||isoDate(now())).getTime(),dateOf:$('#ffDate').value||isoDate(now()),type:$('#ffType').value,basis:$('#ffBasis').value,description:$('#ffDesc').value,gross,vat,net:gross-vat,status:$('#ffStatus').value,invoiceId:'INV-'+new Date().getFullYear()+'-'+(state.feeLedger.length+1).toString().padStart(4,'0'),receivedAt:$('#ffStatus').value==='received'?now():null,allocations:[{adviserId:$('#ffAd').value,costCentreId:'',share:1.0}]};
+  state.feeLedger.push(f);await idbPut('feeLedger',f);
+  await appendAudit('fee.recorded','User recorded fee',{id:f.id,clientId:f.clientId,adviserId:f.adviserId,net:f.net,type:f.type});
+  broadcastFeeRecorded(f);
+  closeModal();toast('fee saved');render();
+}
+function feeDetail(f){
+  const cl=state.clients.find(c=>c.id===f.clientId);const adv=state.advisers.find(a=>a.id===f.adviserId);
+  return `
+  <div class="kpi"><span class="l">Invoice ID</span><span class="v mono">${esc(f.invoiceId||f.id)}</span></div>
+  <div class="kpi"><span class="l">Client</span><span class="v">${esc(cl?cl.firstName+' '+cl.lastName:'(unknown)')}</span></div>
+  <div class="kpi"><span class="l">Adviser</span><span class="v">${esc(adv?adv.name:'(unknown)')}</span></div>
+  <div class="kpi"><span class="l">Date</span><span class="v">${isoDate(f.ts)}</span></div>
+  <div class="kpi"><span class="l">Type · basis</span><span class="v">${esc(f.type)} · ${esc(f.basis)}</span></div>
+  <div class="kpi"><span class="l">Description</span><span class="v" style="font-size:11px">${esc(f.description||'')}</span></div>
+  <div class="kpi"><span class="l">Gross / VAT / Net</span><span class="v">${moneyP(f.gross)} / ${moneyP(f.vat)} / <strong>${moneyP(f.net)}</strong></span></div>
+  <div class="kpi"><span class="l">Status</span><span class="v">${esc(f.status)}</span></div>
+  <div class="actions">
+    <button class="btn sm" onclick="markFeeReceived('${f.id}')">mark received</button>
+    <button class="btn sm" onclick="generateInvoice('${f.id}')">↓ invoice MD</button>
+    <button class="btn sm" onclick="sendInvoiceToFallPaper('${f.id}')">→ FallPaper</button>
+    <button class="btn sm danger" onclick="deleteFee('${f.id}')">delete</button>
+    <button class="btn primary" onclick="closeModal()">close</button>
+  </div>`;
+}
+async function markFeeReceived(id){const f=state.feeLedger.find(x=>x.id===id);if(!f)return;f.status='received';f.receivedAt=now();await idbPut('feeLedger',f);await appendAudit('fee.received','Marked received',{id});toast('received');closeModal();render()}
+async function deleteFee(id){if(!confirm('Delete fee?'))return;state.feeLedger=state.feeLedger.filter(x=>x.id!==id);await idbDel('feeLedger',id);await appendAudit('fee.deleted','User deleted',{id});closeModal();render()}
+function generateInvoice(id){
+  const f=state.feeLedger.find(x=>x.id===id);if(!f)return;
+  const c=state.clients.find(x=>x.id===f.clientId);const fm=state.firm||{};const adv=state.advisers.find(x=>x.id===f.adviserId);
+  const due=isoDate(f.ts+RULES.invoiceTermsDays*dayMs);
+  const md=`# Invoice ${f.invoiceId||f.id}
+
+**${esc(fm.name||'(firm)')}** ${fm.fcaRefNo?'· FCA #'+esc(fm.fcaRefNo):''}
+${fm.registeredAddress?[fm.registeredAddress.line1,fm.registeredAddress.city,fm.registeredAddress.postcode].filter(Boolean).map(esc).join(', '):''}
+${fm.vatNumber?'VAT no: '+esc(fm.vatNumber):''}
+
+---
+
+**Invoice to:**
+${esc((c?.firstName||'')+' '+(c?.lastName||''))}
+${esc(c?.address?.line1||'')}
+${esc(c?.address?.city||'')} ${esc(c?.address?.postcode||'')}
+
+**Date:** ${isoDate(f.ts)}
+**Due:** ${due} (${RULES.invoiceTermsDays} days)
+**Adviser:** ${esc(adv?.name||'')}
+
+---
+
+| Description | Amount |
+|---|---|
+| ${esc(f.description||f.type+' fee')} | ${moneyP(f.gross)} |
+${f.vat?`| VAT @ 20% | ${moneyP(f.vat)} |`:''}
+| **Total** | **${moneyP(f.net)}** |
+
+---
+
+**Payment:**
+${esc(state.settings.bankDetails||'(set bank details in Settings)')}
+Reference: ${esc(f.invoiceId||f.id)}
+
+*Generated by FallPractice v${VERSION} · sovereign on-device.*`;
+  downloadFile('invoice-'+(f.invoiceId||f.id)+'.md',md,'text/markdown');toast('invoice generated');
+}
+function sendInvoiceToFallPaper(feeLedgerId){
+  try{
+    chFallClient&&chFallClient.postMessage({v:1,type:'fallpaper.invoice.generate',ts:now(),source:TOOLNAME,payload:{feeLedgerId}});
+    toast('handed off to FallPaper');
+  }catch(e){toast('mesh unavailable')}
+}
+
+function scheduleForm(){
+  return `
+  <div class="row">
+    <div class="field"><label>Client</label><select id="sfCl">${state.clients.map(c=>`<option value="${c.id}">${esc(c.firstName+' '+c.lastName)}</option>`).join('')||'<option value="">(add a client first)</option>'}</select></div>
+    <div class="field"><label>Adviser</label><select id="sfAd">${state.advisers.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('')||'<option value="">(add an adviser first)</option>'}</select></div>
+  </div>
+  <div class="row3">
+    <div class="field"><label>Frequency</label><select id="sfFreq"><option value="monthly">monthly</option><option value="quarterly" selected>quarterly</option><option value="annually">annually</option></select></div>
+    <div class="field"><label>Amount £</label><input id="sfAmt" type="number" step="0.01" value="450"></div>
+    <div class="field"><label>Basis</label><select id="sfBasis"><option value="flat">flat</option><option value="AUM%" selected>AUM%</option><option value="tiered">tiered</option></select></div>
+  </div>
+  <div class="field"><label>Description</label><input id="sfDesc" value="Recurring ongoing fee"></div>
+  <div class="row">
+    <div class="field"><label>Start date</label><input id="sfStart" type="date" value="${isoDate(now())}"></div>
+    <div class="field"><label>Next due</label><input id="sfNext" type="date" value="${isoDate(now()+30*dayMs)}"></div>
+  </div>
+  <p style="font-size:11px;color:var(--cream-muted);margin:6px 0">When the tool opens, any past-due schedules auto-generate fee ledger entries with status:invoiced.</p>
+  <div class="actions"><button class="btn" onclick="closeModal()">cancel</button><button class="btn primary" onclick="saveSchedule()">save</button></div>`;
+}
+async function saveSchedule(){
+  const s={id:'sc_'+uid(),clientId:$('#sfCl').value,adviserId:$('#sfAd').value,firmId:state.firm?.id||'',frequency:$('#sfFreq').value,amount:+$('#sfAmt').value||0,basis:$('#sfBasis').value,description:$('#sfDesc').value,startDate:$('#sfStart').value,endDate:null,nextDueAt:new Date($('#sfNext').value).getTime(),active:true};
+  state.feeSchedules.push(s);await idbPut('feeSchedules',s);
+  await appendAudit('schedule.created','User created schedule',{id:s.id,clientId:s.clientId,amount:s.amount,frequency:s.frequency});
+  closeModal();toast('schedule saved');render();
+}
+
+function clientForm(){
+  return `
+  <div class="row">
+    <div class="field"><label>First name</label><input id="ncFirst"></div>
+    <div class="field"><label>Last name</label><input id="ncLast"></div>
+  </div>
+  <div class="row">
+    <div class="field"><label>Email</label><input id="ncEmail" type="email"></div>
+    <div class="field"><label>Phone</label><input id="ncPhone"></div>
+  </div>
+  <div class="row">
+    <div class="field"><label>DOB</label><input id="ncDob" type="date"></div>
+    <div class="field"><label>NINO</label><input id="ncNino"></div>
+  </div>
+  <div class="row">
+    <div class="field"><label>Adviser</label><select id="ncAd">${state.advisers.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('')}</select></div>
+    <div class="field"><label>Portfolio value £</label><input id="ncPV" type="number" value="0"></div>
+  </div>
+  <p style="font-size:11px;color:var(--cream-muted);margin:6px 0">Minimal client capture. Use FallOnboard for full KYC/AML. This client will sync via fall-client mesh.</p>
+  <div class="actions"><button class="btn" onclick="closeModal()">cancel</button><button class="btn primary" onclick="saveClient()">save</button></div>`;
+}
+async function saveClient(){
+  const c={id:'cl_'+uid(),firmId:state.firm?.id||'',createdAt:now(),updatedAt:now(),archivedAt:null,title:'',firstName:$('#ncFirst').value,middleName:'',lastName:$('#ncLast').value,preferredName:'',dob:$('#ncDob').value||'',gender:'',nationality:'GB',countryOfResidence:'GB',nino:$('#ncNino').value,utr:'',taxResidency:['GB'],email:$('#ncEmail').value,phone:$('#ncPhone').value,address:{line1:'',city:'',postcode:'',country:'GB'},addressHistory:[],relationships:[],kyc:{status:'pending',riskGrade:'low',pepFlag:false,sanctionsStatus:'not-checked',sourceOfFunds:'',vulnerableCustomerFlag:false,documentsHeld:[],lastReviewAt:null,nextReviewDue:null},suitability:{attitudeToRisk:4,capacityForLoss:'medium',knowledgeExperience:'medium',investmentHorizon:20,objectives:[],incomeNeeds:0,ethicalPreferences:'',lastReviewAt:null},adviserId:$('#ncAd').value,engagement:{startedAt:now(),type:'ongoing',feeBasis:'AUM%',initialFee:0,ongoingFee:0,nextReviewDue:null},notes:[],links:{falladviserScenarios:[],fallpracticeFeeLedgerIds:[],fallpaperDocumentIds:[]},portfolioValue:+$('#ncPV').value||0};
+  state.clients.push(c);await idbPut('clients',c);
+  await appendAudit('client.created','User created client',{id:c.id,name:c.firstName+' '+c.lastName});
+  broadcastUpsert('client.created',c);
+  closeModal();toast('client saved');render();
+}
+
+function adviserForm(){
+  return `
+  <div class="row">
+    <div class="field"><label>Name</label><input id="naName"></div>
+    <div class="field"><label>Email</label><input id="naEmail" type="email"></div>
+  </div>
+  <div class="row">
+    <div class="field"><label>FCA ref</label><input id="naFCA"></div>
+    <div class="field"><label>SMF role</label><select id="naSMF"><option value="">-</option><option value="SMF3">SMF3 · Executive Director</option><option value="SMF22">SMF22 · Chief Executive</option><option value="SMF27">SMF27 · Partner</option><option value="Certified">Certified · adviser</option></select></div>
+  </div>
+  <div class="actions"><button class="btn" onclick="closeModal()">cancel</button><button class="btn primary" onclick="saveAdviser()">save</button></div>`;
+}
+async function saveAdviser(){
+  const a={id:'ad_'+uid(),firmId:state.firm?.id||'',createdAt:now(),updatedAt:now(),archivedAt:null,name:$('#naName').value,email:$('#naEmail').value,phone:'',fcaRefNo:$('#naFCA').value,smcrRole:$('#naSMF').value,status:'active',startedAt:now(),leftAt:null};
+  state.advisers.push(a);await idbPut('advisers',a);
+  await appendAudit('adviser.created','User created adviser',{id:a.id,name:a.name});
+  broadcastUpsert('adviser.created',a);
+  closeModal();toast('adviser saved');render();
+}
+
+function cassForm(){
+  return `
+  <div class="row">
+    <div class="field"><label>Type</label><select id="cfType"><option value="receipt">receipt</option><option value="segregation">segregation</option><option value="disbursement">disbursement</option><option value="reconciliation">reconciliation</option></select></div>
+    <div class="field"><label>Account</label><select id="cfAcc"><option value="cass">cass · client trust</option><option value="firm">firm</option></select></div>
+  </div>
+  <div class="row">
+    <div class="field"><label>Date</label><input id="cfDate" type="date" value="${isoDate(now())}"></div>
+    <div class="field"><label>Amount £</label><input id="cfAmt" type="number" step="0.01" value="0"></div>
+  </div>
+  <div class="field"><label>Client (optional)</label><select id="cfCl"><option value="">-</option>${state.clients.map(c=>`<option value="${c.id}">${esc(c.firstName+' '+c.lastName)}</option>`).join('')}</select></div>
+  <div class="field"><label>Notes</label><textarea id="cfNotes" rows="2"></textarea></div>
+  <div class="actions"><button class="btn" onclick="closeModal()">cancel</button><button class="btn primary" onclick="saveCass()">save</button></div>`;
+}
+async function saveCass(){
+  const e={id:'ce_'+uid(),clientId:$('#cfCl').value,ts:new Date($('#cfDate').value).getTime(),dateOf:$('#cfDate').value,type:$('#cfType').value,amount:+$('#cfAmt').value||0,account:$('#cfAcc').value,notes:$('#cfNotes').value,reconciledAt:$('#cfType').value==='reconciliation'?now():null};
+  state.cassEntries.push(e);await idbPut('cassEntries',e);
+  await appendAudit('cass.entry','User added CASS entry',{id:e.id,type:e.type,amount:e.amount});
+  closeModal();toast('CASS entry saved');render();
+}
+
+function expenseForm(){
+  return `
+  <div class="row">
+    <div class="field"><label>Month</label><input id="efMonth" type="month" value="${monthKey(now())}"></div>
+    <div class="field"><label>Type</label><select id="efType"><option>Adviser salaries</option><option>PI insurance</option><option>FCA fees</option><option>FSCS levy</option><option>Professional body</option><option>Software</option><option>Premises</option><option>Other</option></select></div>
+  </div>
+  <div class="row">
+    <div class="field"><label>Amount £</label><input id="efAmt" type="number" step="0.01" value="0"></div>
+    <div class="field"><label>Notes</label><input id="efNotes"></div>
+  </div>
+  <div class="actions"><button class="btn" onclick="closeModal()">cancel</button><button class="btn primary" onclick="saveExpense()">save</button></div>`;
+}
+async function saveExpense(){
+  const e={id:'ex_'+uid(),month:$('#efMonth').value,type:$('#efType').value,amount:+$('#efAmt').value||0,notes:$('#efNotes').value,ts:now()};
+  state.expenses.push(e);await idbPut('expenses',e);
+  await appendAudit('expense.added','User added expense',{id:e.id,type:e.type,amount:e.amount});
+  closeModal();toast('expense saved');render();
+}
+async function seedMonthlyAccruals(){
+  const m=monthKey(now());
+  const items=[
+    {type:'PI insurance',amount:piMonthlyAccrual(),notes:'Monthly accrual (auto)'},
+    {type:'FCA fees',amount:fcaMonthlyAccrual(),notes:'Monthly accrual (auto)'},
+    {type:'Professional body',amount:profBodyMonthlyAccrual(),notes:'Monthly accrual (auto)'},
+  ];
+  let added=0;
+  for(const it of items){
+    if(!it.amount)continue;
+    const exists=state.expenses.find(e=>e.month===m&&e.type===it.type&&(e.notes||'').includes('auto'));
+    if(exists)continue;
+    const e={id:'ex_'+uid(),month:m,type:it.type,amount:it.amount,notes:it.notes,ts:now()};
+    state.expenses.push(e);await idbPut('expenses',e);added++;
+  }
+  await appendAudit('expense.accruals.seeded','Monthly accruals seeded',{month:m,count:added});
+  toast(added+' accruals seeded');render();
+}
+
+// ─── Palette · Q&A shortcut ───
+async function paletteRun(){
+  const q=($('#pInput').value||'').trim();if(!q)return;
+  const ans=await answerQuestion(q);
+  $('#pBody').innerHTML=`<div class="msg bot" style="margin:0">${formatBotText(ans.text)}<div class="src">${esc(ans.src||'')}</div></div>`;
+}
+
+// ═══════════════════════ BOOT ═══════════════════════
+window.KONOMI={active:true,tier:'sovereign',prime:PRIME,version:VERSION,check:()=>({ok:true,tier:'sovereign',prime:PRIME})};
+
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();openPalette()}
+  if(e.key==='Escape'){closePalette();closeModal()}
+});
+document.addEventListener('click',e=>{if(e.target.classList?.contains('palette-bg'))closePalette();if(e.target.classList?.contains('modal-bg'))closeModal()});
+document.addEventListener('keypress',e=>{if(e.key==='Enter'&&document.activeElement?.id==='pInput')paletteRun()});
+
+window.addEventListener('message',async e=>{
+  const m=e.data;if(!m||typeof m!=='object')return;
+  if(m.type==='fall-rpc'){
+    let r={ok:false};
+    if(m.action==='ping')r={ok:true,tool:TOOLNAME,prime:PRIME,version:VERSION};
+    else if(m.action==='ask'&&m.question){const a=await answerQuestion(m.question);r={ok:true,answer:a.text,src:a.src}}
+    else if(m.action==='ledger')r={ok:true,count:state.feeLedger.length,ytd:ytdFees(),mtd:mtdFees()};
+    try{e.source&&e.source.postMessage({type:'fall-rpc-r',id:m.id,result:r},'*')}catch(err){}
+  }
+});
+
+window.FALLPRACTICE={
+  version:VERSION,prime:PRIME,
+  state:()=>state,
+  recordFee:async f=>{const fee={id:'fl_'+uid(),ts:now(),dateOf:isoDate(now()),allocations:[],...f};fee.net=(fee.gross||0)-(fee.vat||0);state.feeLedger.push(fee);await idbPut('feeLedger',fee);await appendAudit('fee.recorded.api','API recorded',{id:fee.id});broadcastFeeRecorded(fee);render();return fee},
+  ytd:ytdFees,mtd:mtdFees,
+  cassHeld:cassTotalHeld,
+  ask:answerQuestion,
+};
+
+(async function boot(){
+  try{
+    await loadAll();
+    await maybeSeedDemo();
+    await runScheduleCron();
+    setupMesh();
+    render();
+    updateTierBadge();
+    console.log('[fallpractice]','v'+VERSION,'prime',PRIME,'· loaded · clients:',state.clients.length,'advisers:',state.advisers.length,'fees:',state.feeLedger.length);
+  }catch(e){console.error('[fallpractice] boot fail',e);$('#view').innerHTML='<div class="disclaimer">Boot failed: '+esc(e.message)+'</div>'}
+})();
+</script>
+</body>
+</html>
