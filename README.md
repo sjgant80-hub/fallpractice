@@ -1,5 +1,7 @@
 # FallPractice · sovereign IFA firm accounting
 
+**Live:** [sjgant80-hub.github.io/fallpractice](https://sjgant80-hub.github.io/fallpractice/)
+
 **v1.0.0 · prime 739 · single HTML · MIT**
 
 Firm-side accounting for UK financial-advisory practices (1-10 advisers). Adviser fee ledger, recurring schedules, CASS client-money segregation, PI/FCA accruals, per-client RIY, per-adviser P&L, firm P&L, invoice generator, RegData hint dashboard. Part of the IFA Bundle (`falladviser` · `fallonboard` · `fallpaper` · `fallpractice`).
