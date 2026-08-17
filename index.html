@@ -164,19 +164,22 @@ tr.clickable:hover td{background:var(--ink)}
     'llama-3b':  { id: 'Llama-3.2-3B-Instruct-q4f16_1-MLC',   size: '~2GB',   label: '3B · balanced · default · most laptops' },
     'qwen-7b':   { id: 'Qwen2.5-7B-Instruct-q4f16_1-MLC',     size: '~5GB',   label: '7B · capable · needs decent GPU (M-series Mac / 8GB+ VRAM)' },
     'llama-8b':  { id: 'Llama-3.1-8B-Instruct-q4f16_1-MLC',   size: '~5GB',   label: '8B · common · needs decent GPU' },
-    'llama-70b': { id: 'Llama-3.1-70B-Instruct-q4f16_1-MLC',  size: '~40GB',  label: '70B · frontier · needs serious GPU + 64GB+ RAM' }};
+    'llama-70b': { id: 'Llama-3.1-70B-Instruct-q4f16_1-MLC',  size: '~40GB',  label: '70B · frontier · needs serious GPU + 64GB+ RAM' },
+  };
   const DEFAULT_MODEL = 'llama-3b';
 
   const T3_PROVIDERS = {
     anthropic: { label: 'Anthropic Claude', models: ['claude-sonnet-4-5','claude-opus-4-7','claude-haiku-4-5'], default: 'claude-sonnet-4-5', url: 'https://api.anthropic.com/v1/messages' },
     openai:    { label: 'OpenAI',           models: ['gpt-4o','gpt-4o-mini','o1-mini'],                          default: 'gpt-4o-mini',      url: 'https://api.openai.com/v1/chat/completions' },
-    google:    { label: 'Google Gemini',    models: ['gemini-1.5-pro','gemini-1.5-flash','gemini-2.0-flash-exp'], default: 'gemini-1.5-flash', url: 'https://generativelanguage.googleapis.com/v1beta/models/' }};
+    google:    { label: 'Google Gemini',    models: ['gemini-1.5-pro','gemini-1.5-flash','gemini-2.0-flash-exp'], default: 'gemini-1.5-flash', url: 'https://generativelanguage.googleapis.com/v1beta/models/' },
+  };
 
   // ─── State ───────────────────────────────────────────────────────
   const STATE = {
     config: loadConfig(),
     ai: { ready: false, loading: false, progress: 0, engine: null, model: null },
-    mesh: { active: false, peers: new Map(), bc: null, signal: null }};
+    mesh: { active: false, peers: new Map(), bc: null, signal: null },
+  };
 
   function loadConfig() {
     try { return JSON.parse(localStorage.getItem('fall-kit.config') || '{}'); }
@@ -243,7 +246,8 @@ tr.clickable:hover td{background:var(--ink)}
     if (tier === 'T2' && STATE.ai.ready && STATE.ai.engine) {
       const r = await STATE.ai.engine.chat.completions.create({
         messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userMsg }],
-        max_tokens: maxTokens});
+        max_tokens: maxTokens,
+      });
       return r.choices[0].message.content;
     }
     if (tier === 'T3' && STATE.config.api_key && STATE.config.api_provider) {
@@ -260,7 +264,8 @@ tr.clickable:hover td{background:var(--ink)}
       const r = await fetch(T3_PROVIDERS.anthropic.url, {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model, max_tokens: maxTokens, system: sys, messages: [{ role: 'user', content: msg }] })});
+        body: JSON.stringify({ model, max_tokens: maxTokens, system: sys, messages: [{ role: 'user', content: msg }] }),
+      });
       if (!r.ok) throw new Error('Anthropic ' + r.status + ': ' + (await r.text()).slice(0, 200));
       const j = await r.json();
       return j.content[0].text;
@@ -269,7 +274,8 @@ tr.clickable:hover td{background:var(--ink)}
       const r = await fetch(T3_PROVIDERS.openai.url, {
         method: 'POST',
         headers: { 'content-type': 'application/json', 'Authorization': 'Bearer ' + key },
-        body: JSON.stringify({ model, max_tokens: maxTokens, messages: [{ role: 'system', content: sys }, { role: 'user', content: msg }] })});
+        body: JSON.stringify({ model, max_tokens: maxTokens, messages: [{ role: 'system', content: sys }, { role: 'user', content: msg }] }),
+      });
       if (!r.ok) throw new Error('OpenAI ' + r.status);
       const j = await r.json();
       return j.choices[0].message.content;
@@ -278,7 +284,8 @@ tr.clickable:hover td{background:var(--ink)}
       const r = await fetch(T3_PROVIDERS.google.url + model + ':generateContent?key=' + encodeURIComponent(key), {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: sys + '\n\n---\n\n' + msg }] }], generationConfig: { maxOutputTokens: maxTokens } })});
+        body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: sys + '\n\n---\n\n' + msg }] }], generationConfig: { maxOutputTokens: maxTokens } }),
+      });
       if (!r.ok) throw new Error('Google ' + r.status);
       const j = await r.json();
       return j.candidates[0].content.parts[0].text;
@@ -519,7 +526,8 @@ tr.clickable:hover td{background:var(--ink)}
     openMint: openMint,  // v1.2 · launch kcc-mint with this seed prefilled as parent
     MODELS: WEBLLM_MODELS,
     PROVIDERS: T3_PROVIDERS,
-    state: STATE};
+    state: STATE,
+  };
 })(typeof window !== 'undefined' ? window : globalThis);
 
 </script>
@@ -590,7 +598,8 @@ const RULES={
   rmarFreqMonths:6,                 // half-yearly RMAR for IFAs
   fcaFeeQuarterMonth:7,             // FCA invoices issued July, due Aug
   invoiceTermsDays:14,
-  pencePerPound:100};
+  pencePerPound:100,
+};
 
 const TABS=[
   {id:'dashboard',label:'◊ dashboard'},
@@ -602,7 +611,8 @@ const TABS=[
   {id:'firm-pl',label:'firm P&L'},
   {id:'expenses',label:'expenses'},
   {id:'regdata',label:'RegData'},
-  {id:'qa',label:'Q&A'}];
+  {id:'qa',label:'Q&A'},
+];
 
 let state={
   active:'dashboard',
@@ -624,7 +634,9 @@ let state={
     fcaAnnualEstimate:1500,
     profBodyAnnual:300,
     bankDetails:'',
-    demoLoaded:false}};
+    demoLoaded:false,
+  },
+};
 
 // ─── util ───
 const $=(s,p=document)=>p.querySelector(s);
@@ -706,8 +718,9 @@ async function maybeSeedDemo(){
   // 3 demo fees spanning last quarter
   const fees=[
     {id:'fl_'+uid(),clientId:cl.id,adviserId:adv.id,firmId,ts:now()-85*dayMs,dateOf:isoDate(now()-85*dayMs),type:'initial',basis:'flat',description:'Initial advice + onboarding fee',gross:1500,vat:0,net:1500,status:'received',invoiceId:'INV-2026-001',receivedAt:now()-78*dayMs,allocations:[{adviserId:adv.id,costCentreId:'',share:1.0}],demo:true},
-    {id:'fl_'+uid(),clientId:cl.id,adviserId:adv.id,firmId,ts:now()-55*dayMs,dateOf:isoDate(now()-55*dayMs),type:'ongoing',basis:'AUM%',description:'Quarterly ongoing fee · 0.75% AUM · TBAk',gross:450,vat:0,net:450,status:'received',invoiceId:'INV-2026-002',receivedAt:now()-48*dayMs,allocations:[{adviserId:adv.id,costCentreId:'',share:1.0}],demo:true},
-    {id:'fl_'+uid(),clientId:cl.id,adviserId:adv.id,firmId,ts:now()-12*dayMs,dateOf:isoDate(now()-12*dayMs),type:'ongoing',basis:'AUM%',description:'Quarterly ongoing fee · 0.75% AUM · TBAk',gross:450,vat:0,net:450,status:'invoiced',invoiceId:'INV-2026-003',receivedAt:null,allocations:[{adviserId:adv.id,costCentreId:'',share:1.0}],demo:true}];
+    {id:'fl_'+uid(),clientId:cl.id,adviserId:adv.id,firmId,ts:now()-55*dayMs,dateOf:isoDate(now()-55*dayMs),type:'ongoing',basis:'AUM%',description:'Quarterly ongoing fee · 0.75% AUM · £240k',gross:450,vat:0,net:450,status:'received',invoiceId:'INV-2026-002',receivedAt:now()-48*dayMs,allocations:[{adviserId:adv.id,costCentreId:'',share:1.0}],demo:true},
+    {id:'fl_'+uid(),clientId:cl.id,adviserId:adv.id,firmId,ts:now()-12*dayMs,dateOf:isoDate(now()-12*dayMs),type:'ongoing',basis:'AUM%',description:'Quarterly ongoing fee · 0.75% AUM · £240k',gross:450,vat:0,net:450,status:'invoiced',invoiceId:'INV-2026-003',receivedAt:null,allocations:[{adviserId:adv.id,costCentreId:'',share:1.0}],demo:true},
+  ];
   for(const f of fees){state.feeLedger.push(f);await idbPut('feeLedger',f)}
   // recurring schedule
   const sched={id:'sc_'+uid(),clientId:cl.id,adviserId:adv.id,firmId,frequency:'quarterly',amount:450,basis:'AUM%',description:'Quarterly ongoing fee · 0.75% AUM',startDate:isoDate(now()-180*dayMs),endDate:null,nextDueAt:now()+78*dayMs,active:true,demo:true};
@@ -743,7 +756,8 @@ async function runScheduleCron(){
         status:'invoiced',invoiceId:'INV-AUTO-'+(state.feeLedger.length+1).toString().padStart(4,'0'),
         receivedAt:null,
         allocations:[{adviserId:s.adviserId,costCentreId:'',share:1.0}],
-        scheduleId:s.id};
+        scheduleId:s.id,
+      };
       state.feeLedger.push(fee);await idbPut('feeLedger',fee);
       generated++;
       // advance
@@ -962,7 +976,7 @@ ${piDaysToExpiry()!==null?'PI policy expires in '+piDaysToExpiry()+' days.':''}`
 - **Single claim** · €1.3m (≈ ${money(RULES.piMinCoverSingle)})
 - **Aggregate** · €1.924m (≈ ${money(RULES.piMinCoverAggregate)})
 - Personal investment firms specifically: PROF 1 + MIPRU 3 require PI as continuing operational condition.
-- Excess: typically TBA per claim; **must be capitalised** if above TBAk per FCA expectations.
+- Excess: typically £5k-£25k per claim; **must be capitalised** if above £5k per FCA expectations.
 - Cover from a UK or EEA insurer authorised in general insurance.
 
 Your firm: ${state.firm?.piInsurer||'(insurer not set)'} · policy ${state.firm?.piPolicyNo||'(none)'} · expires ${state.firm?.piExpiresAt?isoDate(state.firm.piExpiresAt):'(not set)'} · monthly accrual ${money(piMonthlyAccrual())}.
@@ -972,7 +986,7 @@ ${piDaysToExpiry()!==null&&piDaysToExpiry()<60?'⚠ Renewal due in '+piDaysToExp
 - **RMAR** (Retail Mediation Activities Return) — **half-yearly** for most personal investment firms.
 - RMA reporting periods typically end 30 June and 31 December; submissions due **30 working days** after period end.
 - Other returns: **CCR007** quarterly for some, **FSA002** (capital adequacy) annual.
-- Late submission: TBA fixed penalty + reputational notes on firm record.
+- Late submission: £250 fixed penalty + reputational notes on firm record.
 
 Next windows roughly:
 - Jul-Aug · 30 June period
@@ -1000,7 +1014,7 @@ Current trail entries: ${state.feeLedger.filter(f=>f.type==='trail-commission').
 
 Four outcomes:
 1. **Products & services** · fit target market
-2. **Access & value** · fair value (not the cheapest, the most appropriate)
+2. **Price & value** · fair value (not the cheapest, the most appropriate)
 3. **Consumer understanding** · clear, fair, not misleading
 4. **Consumer support** · throughout the lifecycle
 
@@ -1028,12 +1042,13 @@ Practical: **7 years** is the common safe-harbour figure most firms run with. Fa
 Your advisers: ${state.advisers.length} configured · ${state.advisers.filter(a=>a.smcrRole).length} with SMF role recorded.`},
   {id:'fscs',match:/fscs|compensation scheme/i,answer:()=>`**FSCS · Financial Services Compensation Scheme:**
 
-- IFA investment claims compensation limit: **TBA** per person per failed firm.
+- IFA investment claims compensation limit: **£85,000** per person per failed firm.
 - Levy: paid annually, invoiced by FCA in July/August alongside periodic fee.
 - Levy class for IFAs: **SC02** (Life Distribution & Investment Intermediation).
-- Recent annual SC02 levies have ranged TBAm-TBAm across the class — your firm's share scales with eligible income reported on RMAR.
+- Recent annual SC02 levies have ranged £130m-£330m across the class — your firm's share scales with eligible income reported on RMAR.
 
-Track FSCS levy in the Expenses tab as a separate line so you can see the year-on-year cost trend.`}];
+Track FSCS levy in the Expenses tab as a separate line so you can see the year-on-year cost trend.`},
+];
 async function answerQuestion(q){
   for(const r of T0_RULES){if(r.match.test(q))return{src:'T0 · UK IFA rules engine',text:r.answer()}}
   const tier=await Cascade.detectTier();
@@ -1397,7 +1412,7 @@ function viewRegData(){
       <div class="kpi"><span class="l">Period end</span><span class="v brass">${next.periodEnd}</span></div>
       <div class="kpi"><span class="l">Submission opens</span><span class="v">${next.opens}</span></div>
       <div class="kpi"><span class="l">Submission due by</span><span class="v ${next.daysToDue<14?'amber':''}">${next.due} (${next.daysToDue}d)</span></div>
-      <p style="font-size:11px;color:var(--cream-muted);margin-top:8px">FallPractice is a reminder + checklist. The actual submission happens on the FCA RegData portal. Late submission: TBA fixed penalty.</p>
+      <p style="font-size:11px;color:var(--cream-muted);margin-top:8px">FallPractice is a reminder + checklist. The actual submission happens on the FCA RegData portal. Late submission: £250 fixed penalty.</p>
     </div>
     <div class="card"><h3>What to gather</h3>
       <ul class="checklist">
@@ -1451,7 +1466,7 @@ function viewQA(){
     </div>
   </div>`;
 }
-function formatBotText(t){return esc(t).replace(/\*\*([^*]+)\*\*/g,'<strong>TBA</strong>').replace(/`([^`]+)`/g,'<code style="background:var(--ink);padding:1px 5px;border-radius:2px;font-size:11px">TBA</code>').replace(/\n/g,'<br>')}
+function formatBotText(t){return esc(t).replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code style="background:var(--ink);padding:1px 5px;border-radius:2px;font-size:11px">$1</code>').replace(/\n/g,'<br>')}
 function scrollChatBottom(){const c=$('#chatScroll');if(c)c.scrollTop=c.scrollHeight}
 
 async function askQA(){
@@ -1869,7 +1884,8 @@ async function seedMonthlyAccruals(){
   const items=[
     {type:'PI insurance',amount:piMonthlyAccrual(),notes:'Monthly accrual (auto)'},
     {type:'FCA fees',amount:fcaMonthlyAccrual(),notes:'Monthly accrual (auto)'},
-    {type:'Professional body',amount:profBodyMonthlyAccrual(),notes:'Monthly accrual (auto)'}];
+    {type:'Professional body',amount:profBodyMonthlyAccrual(),notes:'Monthly accrual (auto)'},
+  ];
   let added=0;
   for(const it of items){
     if(!it.amount)continue;
@@ -1916,7 +1932,8 @@ window.FALLPRACTICE={
   recordFee:async f=>{const fee={id:'fl_'+uid(),ts:now(),dateOf:isoDate(now()),allocations:[],...f};fee.net=(fee.gross||0)-(fee.vat||0);state.feeLedger.push(fee);await idbPut('feeLedger',fee);await appendAudit('fee.recorded.api','API recorded',{id:fee.id});broadcastFeeRecorded(fee);render();return fee},
   ytd:ytdFees,mtd:mtdFees,
   cassHeld:cassTotalHeld,
-  ask:answerQuestion};
+  ask:answerQuestion,
+};
 
 (async function boot(){
   try{
